@@ -46,6 +46,13 @@ CONFIGS=(
   "8b-w8a8_tp2|0,1|nm-testing/Qwen3-8B-W8A8-INT8|--tensor-parallel-size 2"
   "4b-awq_1gpu|1|Qwen/Qwen3-4B-AWQ|"
   "4b-awq_dp2|0,1|Qwen/Qwen3-4B-AWQ|--data-parallel-size 2"
+  "4b-awq_tp2|0,1|Qwen/Qwen3-4B-AWQ|--tensor-parallel-size 2"
+  # 8B as 2 copies: with torch.compile (Inductor) the GPU0 copy runs out of memory while autotuning a 2,048-token
+  # logits buffer (1.16 GiB), so these run with the Inductor backend off; the _eager 1-GPU and TP=2 runs measure what
+  # that costs, so H1 compares like with like.
+  "8b-awq_dp2_eager|0,1|Qwen/Qwen3-8B-AWQ|--data-parallel-size 2 --compilation-config {\"backend\":\"eager\"}"
+  "8b-awq_1gpu_eager|1|Qwen/Qwen3-8B-AWQ|--compilation-config {\"backend\":\"eager\"}"
+  "8b-awq_tp2_eager|0,1|Qwen/Qwen3-8B-AWQ|--tensor-parallel-size 2 --compilation-config {\"backend\":\"eager\"}"
 )
 # vLLM server and the bench client run on CPUSET (taskset) so other CPU work on the PC cannot skew the numbers
 CPUSET="${CPUSET:-0-19}"
@@ -92,7 +99,7 @@ try_start() {  # try_start <label> <kv args>: start the server; 0 = up and survi
   stop_server "$SPID" || exit 1; return 1
 }
 
-{ echo "run_id $RUN_ID"; echo "cpuset $CPUSET"; cat results/versions.txt 2>/dev/null; echo "common $COMMON"; echo "in $IN out $OUTLEN seed $SEED"; } > "$OUT/run.txt"
+{ echo "run_id $RUN_ID"; echo "cpuset $CPUSET"; echo "idle_mib gpu0 ${IDLE[0]} gpu1 ${IDLE[1]}"; cat results/versions.txt 2>/dev/null; echo "common $COMMON"; echo "in $IN out $OUTLEN seed $SEED"; } > "$OUT/run.txt"
 for c in "${CONFIGS[@]}"; do
   IFS='|' read -r NAME GPUS MODEL EXTRA <<<"$c"
   [ -n "${ONLY:-}" ] && [[ " $ONLY " != *" $NAME "* ]] && continue

@@ -29,11 +29,11 @@ def build_corpus(model, n_passages, length, seed):
     from datasets import load_dataset
     from transformers import AutoTokenizer
     tok = AutoTokenizer.from_pretrained(model)
-    text = "\n".join(load_dataset("wikitext", "wikitext-2-raw-v1", split="test")["text"])
+    text = "\n".join(load_dataset("Salesforce/wikitext", "wikitext-2-raw-v1", split="test")["text"])
     ids = tok(text, add_special_tokens=False)["input_ids"]
     rng = random.Random(seed)
     starts = sorted(rng.sample(range(0, len(ids) - length, length), n_passages))
-    return {"source": "wikitext-2-raw-v1 test", "tokenizer": model, "seed": seed, "length": length,
+    return {"source": "Salesforce/wikitext wikitext-2-raw-v1 test", "tokenizer": model, "seed": seed, "length": length,
             "passages": [ids[s:s + length] for s in starts]}
 
 
