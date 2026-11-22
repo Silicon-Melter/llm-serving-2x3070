@@ -11,7 +11,7 @@ BULK="${BULK:-/media/earth/SSD2/llm-serving}"; VENV="$BULK/envs/serve-vllm"
 export HF_HUB_CACHE="${HF_HUB_CACHE:-$BULK/hf}"
 PORT=8000; HOST=127.0.0.1; CPUSET="${CPUSET:-0-19}"; SEED=1234
 STAGES="${STAGES:-kld gsm8k mmlu}"; MMLU_LIMIT="${MMLU_LIMIT:-20}"; GSM8K_LIMIT="${GSM8K_LIMIT:-}"
-CONCURRENCY="${CONCURRENCY:-16}"   # requests in flight from the evaluator; a second run with another value = noise floor
+CONCURRENCY="${CONCURRENCY:-32}"   # requests in flight from the evaluator; a second run with another value = noise floor
 RUN_ID="${RUN_ID:-$(date +%Y%m%d-%H%M%S)}"; OUT="results/quality/$RUN_ID"; mkdir -p "$OUT"
 CORPUS="results/quality/corpus.json"
 COMMON="--max-model-len 4096 --max-num-seqs 32 --port $PORT --host $HOST --seed $SEED"
@@ -56,7 +56,7 @@ for c in "${CONFIGS[@]}"; do
     taskset -c "$CPUSET" "$VENV/bin/python" scripts/07_kld.py collect --corpus "$CORPUS" --model "$MODEL" \
       --out "$D/logprobs.jsonl.gz" --concurrency "$CONCURRENCY" && echo "  kld: collected ($(( $(date +%s) - T0 )) s)" || echo "  kld: FAILED"
   fi
-  LM="$VENV/bin/lm_eval --model local-completions --model_args model=$MODEL,base_url=http://$HOST:$PORT/v1/completions,num_concurrent=$CONCURRENCY,max_retries=3,tokenized_requests=False,tokenizer=$MODEL --batch_size 1 --log_samples --seed $SEED --output_path $D/lm_eval"
+  LM="$VENV/bin/lm_eval --model local-completions --model_args model=$MODEL,base_url=http://$HOST:$PORT/v1/completions,num_concurrent=$CONCURRENCY,max_retries=3,tokenized_requests=False,tokenizer=$MODEL,max_length=4096 --batch_size 1 --log_samples --seed $SEED --output_path $D/lm_eval"
   if [[ " $STAGES " == *" gsm8k "* ]]; then T0=$(date +%s)
     taskset -c "$CPUSET" $LM --tasks gsm8k --num_fewshot 5 --gen_kwargs temperature=0 ${GSM8K_LIMIT:+--limit $GSM8K_LIMIT} > "$D/gsm8k.log" 2>&1 \
       && echo "  gsm8k: $(grep -E 'strict-match' "$D/gsm8k.log" | head -1 | tr -s ' ') ($(( $(date +%s) - T0 )) s)" || echo "  gsm8k: FAILED (see $D/gsm8k.log)"
