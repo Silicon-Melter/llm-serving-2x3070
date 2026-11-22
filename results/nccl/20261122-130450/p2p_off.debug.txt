@@ -1,0 +1,99 @@
+earth-67011209:318419:318419 [0] NCCL INFO ncclOsDlopen(libnccl-env.so) failed: libnccl-env.so: cannot open shared object file: No such file or directory
+earth-67011209:318419:318419 [0] NCCL INFO ENV/Plugin: Could not find: libnccl-env.so
+earth-67011209:318419:318419 [0] NCCL INFO cudaDriverVersion 13020
+earth-67011209:318419:318419 [0] NCCL INFO NCCL version 2.30.7+cuda13.3
+earth-67011209:318419:318419 [0] NCCL INFO NCCL git version HEAD a5187fa2e
+earth-67011209:318419:318445 [1] NCCL INFO ncclOsDlopen(libnccl-net.so) failed: libnccl-net.so: cannot open shared object file: No such file or directory
+earth-67011209:318419:318445 [1] NCCL INFO NET/Plugin: Could not find: libnccl-net.so
+earth-67011209:318419:318445 [1] NCCL INFO Count not open libibverbs.so
+earth-67011209:318419:318445 [1] NCCL INFO NET/IB : No device found.
+earth-67011209:318419:318445 [1] NCCL INFO NET/IB : Using [RO]; OOB enp6s0:10.42.0.50<0>
+earth-67011209:318419:318445 [1] NCCL INFO Failed to initialize NET plugin IB
+earth-67011209:318419:318445 [1] NCCL INFO NET/Socket : Using [0]enp6s0:10.42.0.50<0> [1]wlp5s0:10.66.14.133<0> [2]tailscale0:100.111.25.78<0>
+earth-67011209:318419:318445 [1] NCCL INFO Initialized NET plugin Socket
+earth-67011209:318419:318445 [1] NCCL INFO Assigned NET plugin Socket to comm
+earth-67011209:318419:318444 [0] NCCL INFO Initialized NET plugin Socket
+earth-67011209:318419:318445 [1] NCCL INFO ncclOsDlopen(libnccl-rma.so) failed: libnccl-rma.so: cannot open shared object file: No such file or directory
+earth-67011209:318419:318445 [1] NCCL INFO RMA/Plugin: Could not find: libnccl-rma.so
+earth-67011209:318419:318445 [1] NCCL INFO RMA/Plugin: Failed to load external plugin libnccl-rma.so, dlHandle: (nil), ncclRma: (nil)
+earth-67011209:318419:318445 [1] NCCL INFO RMA/Plugin: Failed to initialize any plugin
+earth-67011209:318419:318444 [0] NCCL INFO Assigned NET plugin Socket to comm
+earth-67011209:318419:318444 [0] NCCL INFO RMA/Plugin: Failed to initialize any plugin
+earth-67011209:318419:318445 [1] NCCL INFO ncclOsDlopen(libnccl-gin.so) failed: libnccl-gin.so: cannot open shared object file: No such file or directory
+earth-67011209:318419:318445 [1] NCCL INFO GIN/Plugin: Could not find: libnccl-gin.so
+earth-67011209:318419:318445 [1] NCCL INFO GIN/Plugin: Failed to load external plugin libnccl-gin.so, dlHandle: (nil), ncclGin: (nil)
+earth-67011209:318419:318445 [1] NCCL INFO GIN/Plugin: Failed to initialize any GIN plugin
+earth-67011209:318419:318445 [1] NCCL INFO Using network Socket
+earth-67011209:318419:318444 [0] NCCL INFO GIN/Plugin: Failed to initialize any GIN plugin
+earth-67011209:318419:318444 [0] NCCL INFO Using network Socket
+earth-67011209:318419:318445 [1] NCCL INFO Loaded NVML from libnvidia-ml.so.1
+earth-67011209:318419:318445 [1] NCCL INFO [Rank 1] ncclCommInitRankConfig comm 0x55d08fb81320 rank 1 nranks 2 cudaDev 1 nvmlDev 1 busId b000 commId 0xd66944ffab77914a - Init START
+earth-67011209:318419:318444 [0] NCCL INFO [Rank 0] ncclCommInitRankConfig comm 0x55d08fa5a3c0 rank 0 nranks 2 cudaDev 0 nvmlDev 0 busId a000 commId 0xd66944ffab77914a - Init START
+earth-67011209:318419:318445 [1] NCCL INFO RAS client listening socket at 127.0.0.1<28028>
+earth-67011209:318419:318445 [1] NCCL INFO NCCL_P2P_DISABLE set by environment to 1
+earth-67011209:318419:318444 [0] NCCL INFO NCCL_P2P_DISABLE set by environment to 1
+earth-67011209:318419:318445 [1] NCCL INFO ncclTopoGetCpuAffinity: Affinity for GPU 1 is empty, ignoring. (GPU affinity =  ; CPU affinity = 0-31).
+earth-67011209:318419:318445 [1] NCCL INFO NVLS multicast support is not available on dev 1
+earth-67011209:318419:318444 [0] NCCL INFO ncclTopoGetCpuAffinity: Affinity for GPU 0 is empty, ignoring. (GPU affinity =  ; CPU affinity = 0-31).
+earth-67011209:318419:318444 [0] NCCL INFO NVLS multicast support is not available on dev 0
+earth-67011209:318419:318445 [1] NCCL INFO Rank 1: 3 Net devices
+earth-67011209:318419:318445 [1] NCCL INFO Rank 1: 0 CollNet devices
+earth-67011209:318419:318444 [0] NCCL INFO Rank 0: 3 Net devices
+earth-67011209:318419:318444 [0] NCCL INFO Rank 0: 0 CollNet devices
+earth-67011209:318419:318445 [1] NCCL INFO comm 0x55d08fb81320 rank 1 nRanks 2 nNodes 1 localRanks 2 localRank 1 MNNVL 0
+earth-67011209:318419:318445 [1] NCCL INFO Trees [0] -1/-1/-1->1->0 [1] -1/-1/-1->1->0
+earth-67011209:318419:318445 [1] NCCL INFO P2P Chunksize set to 131072
+earth-67011209:318419:318444 [0] NCCL INFO Local Net device counts across ranks: min 3 max 3
+earth-67011209:318419:318444 [0] NCCL INFO Local CollNet device counts across ranks: min 0 max 0
+earth-67011209:318419:318444 [0] NCCL INFO comm 0x55d08fa5a3c0 rank 0 nRanks 2 nNodes 1 localRanks 2 localRank 0 MNNVL 0
+earth-67011209:318419:318444 [0] NCCL INFO Channel 00/02 : 0 1
+earth-67011209:318419:318444 [0] NCCL INFO Channel 01/02 : 0 1
+earth-67011209:318419:318444 [0] NCCL INFO Trees [0] 1/-1/-1->0->-1 [1] 1/-1/-1->0->-1
+earth-67011209:318419:318444 [0] NCCL INFO P2P Chunksize set to 131072
+earth-67011209:318419:318445 [1] NCCL INFO ncclOsDlopen(libnccl-profiler.so) failed: libnccl-profiler.so: cannot open shared object file: No such file or directory
+earth-67011209:318419:318445 [1] NCCL INFO PROFILER/Plugin: Could not find: libnccl-profiler.so
+earth-67011209:318419:318445 [1] NCCL INFO Check P2P Type isAllDirectP2p 0 directMode 1 isAllCudaP2p 0
+earth-67011209:318419:318444 [0] NCCL INFO ncclOsDlopen(libnccl-profiler.so) failed: libnccl-profiler.so: cannot open shared object file: No such file or directory
+earth-67011209:318419:318444 [0] NCCL INFO PROFILER/Plugin: Could not find: libnccl-profiler.so
+earth-67011209:318419:318444 [0] NCCL INFO Check P2P Type isAllDirectP2p 0 directMode 1 isAllCudaP2p 0
+earth-67011209:318419:318447 [0] NCCL INFO [Proxy Service] Device 1 CPU core 30
+earth-67011209:318419:318450 [0] NCCL INFO [Proxy Service UDS] Device 0 CPU core 13
+earth-67011209:318419:318449 [0] NCCL INFO [Proxy Service UDS] Device 1 CPU core 21
+earth-67011209:318419:318447 [1] NCCL INFO proxy listening socket at 10.42.0.50<40607>
+earth-67011209:318419:318448 [0] NCCL INFO [Proxy Service] Device 0 CPU core 13
+earth-67011209:318419:318448 [0] NCCL INFO proxy listening socket at 10.42.0.50<56497>
+earth-67011209:318419:318445 [1] NCCL INFO ncclOsDlopen(libnccl-tuner.so) failed: libnccl-tuner.so: cannot open shared object file: No such file or directory
+earth-67011209:318419:318445 [1] NCCL INFO TUNER/Plugin: Could not find: libnccl-tuner.so
+earth-67011209:318419:318445 [1] NCCL INFO threadThresholds 8/8/64 | 16/8/64 | 512 | 512
+earth-67011209:318419:318445 [1] NCCL INFO 2 coll channels, 2 collnet channels, 0 nvls channels, 2 p2p channels, 2 p2p channels per peer
+earth-67011209:318419:318445 [1] NCCL INFO Symmetric memory is not supported. cuMemEnable 1, globalGinSupport 0, cuMemGdrSupport 0
+earth-67011209:318419:318444 [0] NCCL INFO threadThresholds 8/8/64 | 16/8/64 | 512 | 512
+earth-67011209:318419:318444 [0] NCCL INFO 2 coll channels, 2 collnet channels, 0 nvls channels, 2 p2p channels, 2 p2p channels per peer
+earth-67011209:318419:318444 [0] NCCL INFO Symmetric memory is not supported. cuMemEnable 1, globalGinSupport 0, cuMemGdrSupport 0
+earth-67011209:318419:318444 [0] NCCL INFO CC Off, workFifoBytes 1048576
+earth-67011209:318419:318445 [1] NCCL INFO ncclCommInitRankConfig comm 0x55d08fb81320 rank 1 nranks 2 cudaDev 1 nvmlDev 1 busId b000 commId 0xd66944ffab77914a - Init COMPLETE
+earth-67011209:318419:318445 [1] NCCL INFO Init timings - ncclCommInitRankConfig: rank 1 nranks 2 total 0.22 (kernels 0.18, alloc 0.02, bootstrap 0.00, allgathers 0.00, topo 0.01, graphs 0.00, connections 0.00, rest 0.00)
+earth-67011209:318419:318444 [0] NCCL INFO ncclCommInitRankConfig comm 0x55d08fa5a3c0 rank 0 nranks 2 cudaDev 0 nvmlDev 0 busId a000 commId 0xd66944ffab77914a - Init COMPLETE
+earth-67011209:318419:318444 [0] NCCL INFO Init timings - ncclCommInitRankConfig: rank 0 nranks 2 total 0.22 (kernels 0.18, alloc 0.02, bootstrap 0.00, allgathers 0.00, topo 0.01, graphs 0.00, connections 0.00, rest 0.00)
+earth-67011209:318419:318448 [0] NCCL INFO MMAP allocated shareable host buffer /dev/shm/nccl-Np28pz size 9637888 ptr 0x7991f003b000
+earth-67011209:318419:318447 [1] NCCL INFO MMAP allocated shareable host buffer /dev/shm/nccl-iGrleA size 9637888 ptr 0x7991e87f4000
+earth-67011209:318419:318448 [0] NCCL INFO MMAP allocated shareable host buffer /dev/shm/nccl-wJcoJC size 9637888 ptr 0x7991b36ce000
+earth-67011209:318419:318447 [1] NCCL INFO MMAP allocated shareable host buffer /dev/shm/nccl-dwxMfm size 9637888 ptr 0x7991b2d9c000
+earth-67011209:318419:318448 [0] NCCL INFO MMAP allocated shareable host buffer /dev/shm/nccl-7MwR1X size 4096 ptr 0x799243ecd000
+earth-67011209:318419:318452 [0] NCCL INFO Channel 00 : 0[0] -> 1[1] via SHM/direct
+earth-67011209:318419:318447 [1] NCCL INFO MMAP allocated shareable host buffer /dev/shm/nccl-utcNu4 size 4096 ptr 0x799243ecb000
+earth-67011209:318419:318451 [1] NCCL INFO Channel 00 : 1[1] -> 0[0] via SHM/direct
+earth-67011209:318419:318448 [0] NCCL INFO MMAP allocated shareable host buffer /dev/shm/nccl-jbU490 size 4096 ptr 0x799243ec9000
+earth-67011209:318419:318452 [0] NCCL INFO Channel 01 : 0[0] -> 1[1] via SHM/direct
+earth-67011209:318419:318447 [1] NCCL INFO MMAP allocated shareable host buffer /dev/shm/nccl-AR9xY3 size 4096 ptr 0x799243ec7000
+earth-67011209:318419:318451 [1] NCCL INFO Channel 01 : 1[1] -> 0[0] via SHM/direct
+earth-67011209:318419:318451 [1] NCCL INFO MMAP imported shareable host buffer /dev/shm/nccl-Np28pz size 9637888 ptr 0x7991b1b38000
+earth-67011209:318419:318452 [0] NCCL INFO MMAP imported shareable host buffer /dev/shm/nccl-iGrleA size 9637888 ptr 0x7991b246a000
+earth-67011209:318419:318451 [1] NCCL INFO MMAP imported shareable host buffer /dev/shm/nccl-7MwR1X size 4096 ptr 0x799243ec5000
+earth-67011209:318419:318452 [0] NCCL INFO MMAP imported shareable host buffer /dev/shm/nccl-utcNu4 size 4096 ptr 0x799243ec3000
+earth-67011209:318419:318451 [1] NCCL INFO MMAP imported shareable host buffer /dev/shm/nccl-wJcoJC size 9637888 ptr 0x7991b1206000
+earth-67011209:318419:318452 [0] NCCL INFO MMAP imported shareable host buffer /dev/shm/nccl-dwxMfm size 9637888 ptr 0x7991b08d4000
+earth-67011209:318419:318451 [1] NCCL INFO MMAP imported shareable host buffer /dev/shm/nccl-jbU490 size 4096 ptr 0x799243ec1000
+earth-67011209:318419:318452 [0] NCCL INFO MMAP imported shareable host buffer /dev/shm/nccl-AR9xY3 size 4096 ptr 0x799243ebf000
+earth-67011209:318419:318451 [1] NCCL INFO Connected all rings, use ring PXN 0 GDR 1
+earth-67011209:318419:318452 [0] NCCL INFO Connected all rings, use ring PXN 0 GDR 1

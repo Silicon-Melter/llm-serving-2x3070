@@ -1,0 +1,123 @@
+earth-67011209:317733:317733 [0] NCCL INFO ncclOsDlopen(libnccl-env.so) failed: libnccl-env.so: cannot open shared object file: No such file or directory
+earth-67011209:317733:317733 [0] NCCL INFO ENV/Plugin: Could not find: libnccl-env.so
+earth-67011209:317733:317733 [0] NCCL INFO cudaDriverVersion 13020
+earth-67011209:317733:317733 [0] NCCL INFO NCCL version 2.30.7+cuda13.3
+earth-67011209:317733:317733 [0] NCCL INFO NCCL git version HEAD a5187fa2e
+earth-67011209:317733:317779 [1] NCCL INFO ncclOsDlopen(libnccl-net.so) failed: libnccl-net.so: cannot open shared object file: No such file or directory
+earth-67011209:317733:317779 [1] NCCL INFO NET/Plugin: Could not find: libnccl-net.so
+earth-67011209:317733:317779 [1] NCCL INFO Count not open libibverbs.so
+earth-67011209:317733:317779 [1] NCCL INFO NET/IB : No device found.
+earth-67011209:317733:317779 [1] NCCL INFO NET/IB : Using [RO]; OOB enp6s0:10.42.0.50<0>
+earth-67011209:317733:317779 [1] NCCL INFO Failed to initialize NET plugin IB
+earth-67011209:317733:317779 [1] NCCL INFO NET/Socket : Using [0]enp6s0:10.42.0.50<0> [1]wlp5s0:10.66.14.133<0> [2]tailscale0:100.111.25.78<0>
+earth-67011209:317733:317779 [1] NCCL INFO Initialized NET plugin Socket
+earth-67011209:317733:317779 [1] NCCL INFO Assigned NET plugin Socket to comm
+earth-67011209:317733:317778 [0] NCCL INFO Initialized NET plugin Socket
+earth-67011209:317733:317778 [0] NCCL INFO Assigned NET plugin Socket to comm
+earth-67011209:317733:317779 [1] NCCL INFO ncclOsDlopen(libnccl-rma.so) failed: libnccl-rma.so: cannot open shared object file: No such file or directory
+earth-67011209:317733:317779 [1] NCCL INFO RMA/Plugin: Could not find: libnccl-rma.so
+earth-67011209:317733:317779 [1] NCCL INFO RMA/Plugin: Failed to load external plugin libnccl-rma.so, dlHandle: (nil), ncclRma: (nil)
+earth-67011209:317733:317779 [1] NCCL INFO RMA/Plugin: Failed to initialize any plugin
+earth-67011209:317733:317778 [0] NCCL INFO RMA/Plugin: Failed to initialize any plugin
+earth-67011209:317733:317779 [1] NCCL INFO ncclOsDlopen(libnccl-gin.so) failed: libnccl-gin.so: cannot open shared object file: No such file or directory
+earth-67011209:317733:317779 [1] NCCL INFO GIN/Plugin: Could not find: libnccl-gin.so
+earth-67011209:317733:317779 [1] NCCL INFO GIN/Plugin: Failed to load external plugin libnccl-gin.so, dlHandle: (nil), ncclGin: (nil)
+earth-67011209:317733:317779 [1] NCCL INFO GIN/Plugin: Failed to initialize any GIN plugin
+earth-67011209:317733:317779 [1] NCCL INFO Using network Socket
+earth-67011209:317733:317778 [0] NCCL INFO GIN/Plugin: Failed to initialize any GIN plugin
+earth-67011209:317733:317778 [0] NCCL INFO Using network Socket
+earth-67011209:317733:317778 [0] NCCL INFO Loaded NVML from libnvidia-ml.so.1
+earth-67011209:317733:317779 [1] NCCL INFO [Rank 1] ncclCommInitRankConfig comm 0x5af38e520360 rank 1 nranks 2 cudaDev 1 nvmlDev 1 busId b000 commId 0xb6c06a596e0f299b - Init START
+earth-67011209:317733:317778 [0] NCCL INFO [Rank 0] ncclCommInitRankConfig comm 0x5af38e3f9400 rank 0 nranks 2 cudaDev 0 nvmlDev 0 busId a000 commId 0xb6c06a596e0f299b - Init START
+earth-67011209:317733:317778 [0] NCCL INFO RAS client listening socket at 127.0.0.1<28028>
+earth-67011209:317733:317778 [0] NCCL INFO P2P is disabled between connected GPUs 1 and 0. You can repress this message with NCCL_IGNORE_DISABLED_P2P=1.
+earth-67011209:317733:317779 [1] NCCL INFO P2P is disabled between connected GPUs 1 and 0. You can repress this message with NCCL_IGNORE_DISABLED_P2P=1.
+earth-67011209:317733:317779 [1] NCCL INFO P2P is disabled between connected GPUs 1 and 0. You can repress this message with NCCL_IGNORE_DISABLED_P2P=1.
+earth-67011209:317733:317778 [0] NCCL INFO P2P is disabled between connected GPUs 1 and 0. You can repress this message with NCCL_IGNORE_DISABLED_P2P=1.
+earth-67011209:317733:317778 [0] NCCL INFO P2P is disabled between connected GPUs 0 and 1. You can repress this message with NCCL_IGNORE_DISABLED_P2P=1.
+earth-67011209:317733:317778 [0] NCCL INFO P2P is disabled between connected GPUs 0 and 1. You can repress this message with NCCL_IGNORE_DISABLED_P2P=1.
+earth-67011209:317733:317779 [1] NCCL INFO P2P is disabled between connected GPUs 0 and 1. You can repress this message with NCCL_IGNORE_DISABLED_P2P=1.
+earth-67011209:317733:317779 [1] NCCL INFO P2P is disabled between connected GPUs 0 and 1. You can repress this message with NCCL_IGNORE_DISABLED_P2P=1.
+earth-67011209:317733:317778 [0] NCCL INFO P2P is disabled between connected GPUs 1 and 0. You can repress this message with NCCL_IGNORE_DISABLED_P2P=1.
+earth-67011209:317733:317778 [0] NCCL INFO P2P is disabled between connected GPUs 1 and 0. You can repress this message with NCCL_IGNORE_DISABLED_P2P=1.
+earth-67011209:317733:317778 [0] NCCL INFO P2P is disabled between connected GPUs 0 and 1. You can repress this message with NCCL_IGNORE_DISABLED_P2P=1.
+earth-67011209:317733:317778 [0] NCCL INFO P2P is disabled between connected GPUs 0 and 1. You can repress this message with NCCL_IGNORE_DISABLED_P2P=1.
+earth-67011209:317733:317778 [0] NCCL INFO ncclTopoGetCpuAffinity: Affinity for GPU 0 is empty, ignoring. (GPU affinity =  ; CPU affinity = 0-31).
+earth-67011209:317733:317778 [0] NCCL INFO NVLS multicast support is not available on dev 0
+earth-67011209:317733:317778 [0] NCCL INFO Rank 0: 3 Net devices
+earth-67011209:317733:317778 [0] NCCL INFO Rank 0: 0 CollNet devices
+earth-67011209:317733:317779 [1] NCCL INFO P2P is disabled between connected GPUs 1 and 0. You can repress this message with NCCL_IGNORE_DISABLED_P2P=1.
+earth-67011209:317733:317779 [1] NCCL INFO P2P is disabled between connected GPUs 1 and 0. You can repress this message with NCCL_IGNORE_DISABLED_P2P=1.
+earth-67011209:317733:317779 [1] NCCL INFO P2P is disabled between connected GPUs 0 and 1. You can repress this message with NCCL_IGNORE_DISABLED_P2P=1.
+earth-67011209:317733:317779 [1] NCCL INFO P2P is disabled between connected GPUs 0 and 1. You can repress this message with NCCL_IGNORE_DISABLED_P2P=1.
+earth-67011209:317733:317779 [1] NCCL INFO ncclTopoGetCpuAffinity: Affinity for GPU 1 is empty, ignoring. (GPU affinity =  ; CPU affinity = 0-31).
+earth-67011209:317733:317779 [1] NCCL INFO NVLS multicast support is not available on dev 1
+earth-67011209:317733:317779 [1] NCCL INFO Rank 1: 3 Net devices
+earth-67011209:317733:317779 [1] NCCL INFO Rank 1: 0 CollNet devices
+earth-67011209:317733:317778 [0] NCCL INFO Local Net device counts across ranks: min 3 max 3
+earth-67011209:317733:317778 [0] NCCL INFO Local CollNet device counts across ranks: min 0 max 0
+earth-67011209:317733:317778 [0] NCCL INFO comm 0x5af38e3f9400 rank 0 nRanks 2 nNodes 1 localRanks 2 localRank 0 MNNVL 0
+earth-67011209:317733:317779 [1] NCCL INFO comm 0x5af38e520360 rank 1 nRanks 2 nNodes 1 localRanks 2 localRank 1 MNNVL 0
+earth-67011209:317733:317778 [0] NCCL INFO Channel 00/02 : 0 1
+earth-67011209:317733:317778 [0] NCCL INFO Channel 01/02 : 0 1
+earth-67011209:317733:317779 [1] NCCL INFO Trees [0] -1/-1/-1->1->0 [1] -1/-1/-1->1->0
+earth-67011209:317733:317779 [1] NCCL INFO P2P Chunksize set to 131072
+earth-67011209:317733:317778 [0] NCCL INFO Trees [0] 1/-1/-1->0->-1 [1] 1/-1/-1->0->-1
+earth-67011209:317733:317778 [0] NCCL INFO P2P Chunksize set to 131072
+earth-67011209:317733:317779 [1] NCCL INFO ncclOsDlopen(libnccl-profiler.so) failed: libnccl-profiler.so: cannot open shared object file: No such file or directory
+earth-67011209:317733:317779 [1] NCCL INFO PROFILER/Plugin: Could not find: libnccl-profiler.so
+earth-67011209:317733:317779 [1] NCCL INFO P2P is disabled between connected GPUs 0 and 1. You can repress this message with NCCL_IGNORE_DISABLED_P2P=1.
+earth-67011209:317733:317779 [1] NCCL INFO Check P2P Type isAllDirectP2p 0 directMode 1 isAllCudaP2p 0
+earth-67011209:317733:317778 [0] NCCL INFO ncclOsDlopen(libnccl-profiler.so) failed: libnccl-profiler.so: cannot open shared object file: No such file or directory
+earth-67011209:317733:317778 [0] NCCL INFO PROFILER/Plugin: Could not find: libnccl-profiler.so
+earth-67011209:317733:317778 [0] NCCL INFO P2P is disabled between connected GPUs 0 and 1. You can repress this message with NCCL_IGNORE_DISABLED_P2P=1.
+earth-67011209:317733:317778 [0] NCCL INFO Check P2P Type isAllDirectP2p 0 directMode 1 isAllCudaP2p 0
+earth-67011209:317733:317786 [0] NCCL INFO [Proxy Service] Device 1 CPU core 12
+earth-67011209:317733:317789 [0] NCCL INFO [Proxy Service UDS] Device 0 CPU core 11
+earth-67011209:317733:317788 [0] NCCL INFO [Proxy Service UDS] Device 1 CPU core 7
+earth-67011209:317733:317786 [1] NCCL INFO proxy listening socket at 10.42.0.50<49435>
+earth-67011209:317733:317787 [0] NCCL INFO [Proxy Service] Device 0 CPU core 11
+earth-67011209:317733:317787 [0] NCCL INFO proxy listening socket at 10.42.0.50<35417>
+earth-67011209:317733:317779 [1] NCCL INFO ncclOsDlopen(libnccl-tuner.so) failed: libnccl-tuner.so: cannot open shared object file: No such file or directory
+earth-67011209:317733:317779 [1] NCCL INFO TUNER/Plugin: Could not find: libnccl-tuner.so
+earth-67011209:317733:317779 [1] NCCL INFO threadThresholds 8/8/64 | 16/8/64 | 512 | 512
+earth-67011209:317733:317779 [1] NCCL INFO 2 coll channels, 2 collnet channels, 0 nvls channels, 2 p2p channels, 2 p2p channels per peer
+earth-67011209:317733:317779 [1] NCCL INFO Symmetric memory is not supported. cuMemEnable 1, globalGinSupport 0, cuMemGdrSupport 0
+earth-67011209:317733:317778 [0] NCCL INFO threadThresholds 8/8/64 | 16/8/64 | 512 | 512
+earth-67011209:317733:317778 [0] NCCL INFO 2 coll channels, 2 collnet channels, 0 nvls channels, 2 p2p channels, 2 p2p channels per peer
+earth-67011209:317733:317778 [0] NCCL INFO Symmetric memory is not supported. cuMemEnable 1, globalGinSupport 0, cuMemGdrSupport 0
+earth-67011209:317733:317778 [0] NCCL INFO CC Off, workFifoBytes 1048576
+earth-67011209:317733:317779 [1] NCCL INFO ncclCommInitRankConfig comm 0x5af38e520360 rank 1 nranks 2 cudaDev 1 nvmlDev 1 busId b000 commId 0xb6c06a596e0f299b - Init COMPLETE
+earth-67011209:317733:317779 [1] NCCL INFO Init timings - ncclCommInitRankConfig: rank 1 nranks 2 total 0.27 (kernels 0.23, alloc 0.03, bootstrap 0.00, allgathers 0.00, topo 0.01, graphs 0.00, connections 0.00, rest 0.00)
+earth-67011209:317733:317778 [0] NCCL INFO ncclCommInitRankConfig comm 0x5af38e3f9400 rank 0 nranks 2 cudaDev 0 nvmlDev 0 busId a000 commId 0xb6c06a596e0f299b - Init COMPLETE
+earth-67011209:317733:317778 [0] NCCL INFO Init timings - ncclCommInitRankConfig: rank 0 nranks 2 total 0.27 (kernels 0.23, alloc 0.03, bootstrap 0.00, allgathers 0.00, topo 0.01, graphs 0.00, connections 0.00, rest 0.00)
+earth-67011209:317733:317791 [0] NCCL INFO P2P is disabled between connected GPUs 0 and 1. You can repress this message with NCCL_IGNORE_DISABLED_P2P=1.
+earth-67011209:317733:317790 [1] NCCL INFO P2P is disabled between connected GPUs 1 and 0. You can repress this message with NCCL_IGNORE_DISABLED_P2P=1.
+earth-67011209:317733:317786 [1] NCCL INFO MMAP allocated shareable host buffer /dev/shm/nccl-2fxJeh size 9637888 ptr 0x723f8f6ce000
+earth-67011209:317733:317790 [1] NCCL INFO P2P is disabled between connected GPUs 1 and 0. You can repress this message with NCCL_IGNORE_DISABLED_P2P=1.
+earth-67011209:317733:317787 [0] NCCL INFO MMAP allocated shareable host buffer /dev/shm/nccl-QmyMzv size 9637888 ptr 0x723f8ed9c000
+earth-67011209:317733:317791 [0] NCCL INFO P2P is disabled between connected GPUs 0 and 1. You can repress this message with NCCL_IGNORE_DISABLED_P2P=1.
+earth-67011209:317733:317786 [1] NCCL INFO MMAP allocated shareable host buffer /dev/shm/nccl-Lk704Y size 9637888 ptr 0x723f8e46a000
+earth-67011209:317733:317790 [1] NCCL INFO P2P is disabled between connected GPUs 1 and 0. You can repress this message with NCCL_IGNORE_DISABLED_P2P=1.
+earth-67011209:317733:317787 [0] NCCL INFO MMAP allocated shareable host buffer /dev/shm/nccl-niX5Nf size 9637888 ptr 0x723f8db38000
+earth-67011209:317733:317791 [0] NCCL INFO P2P is disabled between connected GPUs 0 and 1. You can repress this message with NCCL_IGNORE_DISABLED_P2P=1.
+earth-67011209:317733:317786 [1] NCCL INFO MMAP allocated shareable host buffer /dev/shm/nccl-YCu1IB size 4096 ptr 0x72401f2b1000
+earth-67011209:317733:317790 [1] NCCL INFO Channel 00 : 1[1] -> 0[0] via SHM/direct
+earth-67011209:317733:317790 [1] NCCL INFO P2P is disabled between connected GPUs 1 and 0. You can repress this message with NCCL_IGNORE_DISABLED_P2P=1.
+earth-67011209:317733:317787 [0] NCCL INFO MMAP allocated shareable host buffer /dev/shm/nccl-5oLWAC size 4096 ptr 0x72401f2af000
+earth-67011209:317733:317791 [0] NCCL INFO Channel 00 : 0[0] -> 1[1] via SHM/direct
+earth-67011209:317733:317791 [0] NCCL INFO P2P is disabled between connected GPUs 0 and 1. You can repress this message with NCCL_IGNORE_DISABLED_P2P=1.
+earth-67011209:317733:317786 [1] NCCL INFO MMAP allocated shareable host buffer /dev/shm/nccl-90HcNS size 4096 ptr 0x72401effe000
+earth-67011209:317733:317790 [1] NCCL INFO Channel 01 : 1[1] -> 0[0] via SHM/direct
+earth-67011209:317733:317787 [0] NCCL INFO MMAP allocated shareable host buffer /dev/shm/nccl-f66PK8 size 4096 ptr 0x72401effc000
+earth-67011209:317733:317791 [0] NCCL INFO Channel 01 : 0[0] -> 1[1] via SHM/direct
+earth-67011209:317733:317790 [1] NCCL INFO MMAP imported shareable host buffer /dev/shm/nccl-QmyMzv size 9637888 ptr 0x723f8d206000
+earth-67011209:317733:317791 [0] NCCL INFO MMAP imported shareable host buffer /dev/shm/nccl-2fxJeh size 9637888 ptr 0x723f8c8d4000
+earth-67011209:317733:317790 [1] NCCL INFO MMAP imported shareable host buffer /dev/shm/nccl-5oLWAC size 4096 ptr 0x72401effa000
+earth-67011209:317733:317791 [0] NCCL INFO MMAP imported shareable host buffer /dev/shm/nccl-YCu1IB size 4096 ptr 0x72401eff8000
+earth-67011209:317733:317791 [0] NCCL INFO MMAP imported shareable host buffer /dev/shm/nccl-Lk704Y size 9637888 ptr 0x723f86d9c000
+earth-67011209:317733:317790 [1] NCCL INFO MMAP imported shareable host buffer /dev/shm/nccl-niX5Nf size 9637888 ptr 0x723f876ce000
+earth-67011209:317733:317791 [0] NCCL INFO MMAP imported shareable host buffer /dev/shm/nccl-90HcNS size 4096 ptr 0x724012a96000
+earth-67011209:317733:317790 [1] NCCL INFO MMAP imported shareable host buffer /dev/shm/nccl-f66PK8 size 4096 ptr 0x724012a94000
+earth-67011209:317733:317791 [0] NCCL INFO Connected all rings, use ring PXN 0 GDR 1
+earth-67011209:317733:317790 [1] NCCL INFO Connected all rings, use ring PXN 0 GDR 1
