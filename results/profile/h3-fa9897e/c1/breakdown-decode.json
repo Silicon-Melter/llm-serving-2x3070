@@ -1,0 +1,32 @@
+{
+ "rank0.1795356947718723050.pt.trace.json.gz": {
+  "window_ms": 1730.6698232421875,
+  "busy_share": 0.9743837987303754,
+  "idle_share": 0.025616201269624606,
+  "kernels": 111136,
+  "steps": 197,
+  "allreduce_share": 0.09774828991244656,
+  "allreduce_ms": 169.170015625,
+  "gemm_share": 0.8401685378883845,
+  "gemm_ms": 1454.0543349609375,
+  "attention_share": 0.008306019073915745,
+  "attention_ms": 14.3749765625,
+  "other_share": 0.02856416403340276,
+  "other_ms": 49.43513671875
+ },
+ "rank1.1795356948785616424.pt.trace.json.gz": {
+  "window_ms": 1730.671107421875,
+  "busy_share": 0.9756427241357567,
+  "idle_share": 0.0243572758642433,
+  "kernels": 111136,
+  "steps": 197,
+  "allreduce_share": 0.1139780655469107,
+  "allreduce_ms": 197.258544921875,
+  "gemm_share": 0.8260285210643545,
+  "gemm_ms": 1429.5836953125,
+  "attention_share": 0.008245342240210517,
+  "attention_ms": 14.2699755859375,
+  "other_share": 0.027793390982099906,
+  "other_ms": 48.10121875
+ }
+}

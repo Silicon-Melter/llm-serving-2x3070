@@ -59,7 +59,7 @@ for c in "${CONFIGS[@]}"; do
   LM="$VENV/bin/lm_eval --model local-completions --model_args model=$MODEL,base_url=http://$HOST:$PORT/v1/completions,num_concurrent=$CONCURRENCY,max_retries=3,tokenized_requests=False,tokenizer=$MODEL --batch_size 1 --log_samples --seed $SEED --output_path $D/lm_eval"
   if [[ " $STAGES " == *" gsm8k "* ]]; then T0=$(date +%s)
     taskset -c "$CPUSET" $LM --tasks gsm8k --num_fewshot 5 --gen_kwargs temperature=0 ${GSM8K_LIMIT:+--limit $GSM8K_LIMIT} > "$D/gsm8k.log" 2>&1 \
-      && echo "  gsm8k: $(grep -E '^\|gsm8k.*strict-match' "$D/gsm8k.log" | head -1 | tr -s ' ') ($(( $(date +%s) - T0 )) s)" || echo "  gsm8k: FAILED (see $D/gsm8k.log)"
+      && echo "  gsm8k: $(grep -E 'strict-match' "$D/gsm8k.log" | head -1 | tr -s ' ') ($(( $(date +%s) - T0 )) s)" || echo "  gsm8k: FAILED (see $D/gsm8k.log)"
   fi
   if [[ " $STAGES " == *" mmlu "* ]]; then T0=$(date +%s)
     taskset -c "$CPUSET" $LM --tasks mmlu --num_fewshot 5 --limit "$MMLU_LIMIT" > "$D/mmlu.log" 2>&1 \

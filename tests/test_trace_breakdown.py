@@ -40,3 +40,17 @@ def test_breakdown_shares_and_idle(tmp_path):
 
 def test_overlapping_kernels_are_not_double_counted():
     assert tb.union_length([(0, 10), (5, 15), (20, 30)]) == 25
+
+
+def test_decode_only_leaves_out_prefill_windows():
+    k = lambda name, ts, dur: {"ph": "X", "cat": "kernel", "name": name, "ts": ts, "dur": dur}  # noqa: E731
+    prefill = [k("marlin_gemm", 85_000, 5_000), k("ncclDevKernel_AllReduce", 90_000, 500)]     # long all-reduce
+    decode = [k("marlin_gemm", 200_000 + i * 1000, 800) for i in range(50)] + \
+             [k("ncclDevKernel_AllReduce", 200_800 + i * 1000, 100 - 89) for i in range(50)] + \
+             [k("ncclDevKernel_AllGather", 200_811 + i * 1000, 5) for i in range(50)]
+    ev = prefill + decode
+    w = tb.prefill_windows(ev)
+    assert len(w) == 1 and w[0][0] < 85_000 and 90_500 < w[0][1] < 200_000
+    b = tb.breakdown(ev, exclude=w)
+    assert b["steps"] == 50 and b["gemm_ms"] == pytest.approx(40.0) and b["allreduce_ms"] == pytest.approx(50 * (0.011 + 0.005))  # all-gather is NCCL traffic too
+    assert b["window_ms"] == pytest.approx((249_816 - 200_000) / 1e3, rel=1e-3)

@@ -10,7 +10,9 @@ PORT=8000; HOST=127.0.0.1; CPUSET="${CPUSET:-0-19}"; MODEL=Qwen/Qwen3-8B-AWQ
 RUN_ID="${RUN_ID:-$(date +%Y%m%d-%H%M%S)}"; OUT="results/profile/$RUN_ID"; mkdir -p "$OUT"
 TRACE_TMP="$BULK/profile-tmp/$RUN_ID"; mkdir -p "$TRACE_TMP"
 KV="${KV:---kv-cache-memory-bytes 3429174476 --gpu-memory-utilization 0.85}"   # M3's accepted TP=2 KV size
-PROF="{\"profiler\":\"torch\",\"torch_profiler_dir\":\"$TRACE_TMP\"}"
+# No Python stacks (the default records one per op: the first c=64 attempt grew a worker to 27.6 GB RAM and was
+# OOM-killed), and a fixed window of engine steps after a short delay so the trace size does not grow with load.
+PROF="{\"profiler\":\"torch\",\"torch_profiler_dir\":\"$TRACE_TMP\",\"torch_profiler_with_stack\":false,\"delay_iterations\":${DELAY:-30},\"max_iterations\":${STEPS:-120}}"
 CUDA_VISIBLE_DEVICES=0,1 setsid taskset -c "$CPUSET" "$VENV/bin/vllm" serve $MODEL --tensor-parallel-size 2 \
   --max-model-len 4096 --max-num-seqs 64 --disable-prefix-caching --host $HOST --port $PORT $KV \
   --profiler-config "$PROF" > "$OUT/server.log" 2>&1 &
@@ -21,7 +23,7 @@ bench() { taskset -c "$CPUSET" "$VENV/bin/vllm" bench serve --backend vllm --mod
   --dataset-name random --random-range-ratio 0 --ignore-eos --temperature 0 --random-input-len 512 "$@"; }
 bench --random-output-len 32 --num-prompts 64 --max-concurrency 64 > "$OUT/warmup.log" 2>&1
 for C in 1 64; do
-  N=$(( C == 1 ? 4 : 64 )); OL=$(( C == 1 ? 64 : 32 ))
+  N=$(( C == 1 ? 4 : 128 )); OL=$(( C == 1 ? 64 : 64 ))
   curl -sf -X POST "http://$HOST:$PORT/start_profile" >/dev/null || { echo "start_profile failed"; break; }
   bench --random-output-len $OL --num-prompts $N --max-concurrency $C > "$OUT/c$C.bench.log" 2>&1
   curl -sf -X POST "http://$HOST:$PORT/stop_profile" >/dev/null
