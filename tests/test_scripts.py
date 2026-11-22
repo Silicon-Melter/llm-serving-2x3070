@@ -57,3 +57,27 @@ def test_sweep_bench_ok(tmp_path, text, ok):
     log.write_text(text)
     r = subprocess.run(["bash", str(ROOT / "scripts/03_sweep_vllm.sh"), "--check-bench-log", str(log)])
     assert (r.returncode == 0) == ok
+
+
+# Real lines from results/vllm/m3-581eb68/8b-awq_tp2.try-auto.log (TP=2: each rank reports its own sizes)
+KV_RANK1 = ("Replace gpu_memory_utilization config with `--kv-cache-memory=4557176832` (4.24 GiB) to fit into requested "
+            "memory, or `--kv-cache-memory=4185915392` (3.9 GiB) to fully utilize gpu memory.\n"
+            "Memory after warmup: 4.06 GiB free; 512 KV cache blocks (2.25 GiB) fit within the requested 7.66 GiB.\n")
+KV_RANK0 = ("Replace gpu_memory_utilization config with `--kv-cache-memory=4548263936` (4.24 GiB) to fit into requested "
+            "memory, or `--kv-cache-memory=3607560192` (3.36 GiB) to fully utilize gpu memory.\n"
+            "Memory after warmup: 3.52 GiB free; 384 KV cache blocks (1.69 GiB) fit within the requested 7.65 GiB.\n")
+
+
+@pytest.mark.parametrize("text,expected", [
+    (KV_RANK0 + KV_RANK1, "3607560192 1814623682"),
+    (KV_RANK1 + KV_RANK0, "3607560192 1814623682"),   # rank order in the log must not matter
+    ("Traceback: no memory report\n", " 0"),
+], ids=["rank0-first", "rank1-first", "no-report"])
+def test_sweep_kv_parse_takes_smallest_rank(tmp_path, text, expected):
+    """The KV rule must size from the tightest GPU: GPU0 also drives the display, so its numbers are smaller.
+    Taking the last line in the log (as 581eb68 did for the automatic size) depends on rank print order."""
+    log = tmp_path / "server.log"
+    log.write_text(text)
+    r = subprocess.run(["bash", str(ROOT / "scripts/03_sweep_vllm.sh"), "--parse-kv-log", str(log)],
+                       capture_output=True, text=True)
+    assert r.returncode == 0 and r.stdout.strip("\n") == expected, r.stdout + r.stderr

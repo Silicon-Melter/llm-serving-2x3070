@@ -9,7 +9,15 @@ bench_ok() {  # bench_ok <bench log>: at least one request succeeded and none fa
   grep -qE "^Successful requests:\s+[1-9]" "$1" || return 1
   if grep -q "^Failed requests:" "$1"; then grep -qE "^Failed requests:\s+0\s*$" "$1"; fi
 }
+kv_suggest() {  # kv_suggest <server log>: smallest "--kv-cache-memory=X ... to fully utilize" over all ranks (bytes)
+  grep -oE -- "--kv-cache-memory=[0-9]+\` \([0-9.]+ GiB\) to fully utilize" "$1" | grep -oE "[0-9]{6,}" | sort -n | head -1
+}
+kv_auto() {  # kv_auto <server log>: KV size automatic sizing gave, smallest over all ranks (bytes; 0 if none)
+  grep -oE "KV cache blocks \([0-9.]+ GiB\) fit" "$1" | grep -oE "[0-9.]+" | sort -g | head -1 |
+    python3 -c "import sys; v=sys.stdin.read().strip(); print(int(float(v)*2**30) if v else 0)"
+}
 [ "${1:-}" = "--check-bench-log" ] && { bench_ok "$2"; exit $?; }   # used by tests/test_scripts.py
+[ "${1:-}" = "--parse-kv-log" ] && { echo "$(kv_suggest "$2") $(kv_auto "$2")"; exit 0; }
 BULK="${BULK:-/media/earth/SSD2/llm-serving}"; VENV="$BULK/envs/serve-vllm"
 export HF_HUB_CACHE="${HF_HUB_CACHE:-$BULK/hf}"
 PORT=8000; HOST=127.0.0.1                     # 127.0.0.1, not localhost (name lookup adds latency)
@@ -97,8 +105,7 @@ for c in "${CONFIGS[@]}"; do
   # 3) if no explicit size larger than the automatic one passes, fall back to the automatic size.
   STARTED=""; KVARG=""
   try_start auto ""; AUTO_OK=$?
-  SUGGEST=$(grep -oE -- "--kv-cache-memory=[0-9]+\` \([0-9.]+ GiB\) to fully utilize" "$LOG" | grep -oE "[0-9]{6,}" | sort -n | head -1)
-  AUTO_KV=$(grep -oE "KV cache blocks \([0-9.]+ GiB\) fit" "$LOG" | tail -1 | grep -oE "[0-9.]+" | python3 -c "import sys; v=sys.stdin.read().strip(); print(int(float(v)*2**30) if v else 0)")
+  SUGGEST=$(kv_suggest "$LOG"); AUTO_KV=$(kv_auto "$LOG")   # TP/PP ranks report different sizes: take the smallest
   [ $AUTO_OK = 0 ] && stop_server "$SPID"
   if [ -n "$SUGGEST" ]; then
     for A in $KV_STEPS; do
