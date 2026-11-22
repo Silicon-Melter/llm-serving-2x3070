@@ -37,3 +37,23 @@ def test_nccl_binary_resolves_all_libraries():
     missing = [l.strip() for l in r.stdout.splitlines() if "not found" in l]
     assert not missing, f"unresolved libraries: {missing}"
     assert "libnccl.so" in r.stdout and "libcudart.so.13" in r.stdout
+
+
+BENCH_FAILED = "Successful requests:                     0         \nFailed requests:                         128       \n"
+BENCH_OK = "Successful requests:                     128       \nFailed requests:                         0         \n"
+BENCH_OK_NO_FAILED_LINE = "Successful requests:                     128       \n"
+BENCH_ZERO_NO_FAILED_LINE = "Successful requests:                     0         \n"
+BENCH_PARTIAL = "Successful requests:                     120       \nFailed requests:                         8         \n"
+
+
+@pytest.mark.parametrize("text,ok", [(BENCH_FAILED, False), (BENCH_OK, True), (BENCH_OK_NO_FAILED_LINE, True),
+                                     (BENCH_PARTIAL, False), (BENCH_ZERO_NO_FAILED_LINE, False),
+                                     ("Traceback: server died\n", False)],
+                         ids=["all-failed", "ok", "ok-no-failed-line", "partial", "zero-no-failed-line", "no-summary"])
+def test_sweep_bench_ok(tmp_path, text, ok):
+    """03_sweep_vllm.sh must not count a benchmark with failed requests as a result (M2 run 2: 128 x 500 errors
+    were reported as 0.00 tok/s)."""
+    log = tmp_path / "bench.log"
+    log.write_text(text)
+    r = subprocess.run(["bash", str(ROOT / "scripts/03_sweep_vllm.sh"), "--check-bench-log", str(log)])
+    assert (r.returncode == 0) == ok

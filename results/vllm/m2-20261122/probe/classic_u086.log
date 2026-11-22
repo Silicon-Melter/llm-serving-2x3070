@@ -1,0 +1,426 @@
+W1122 13:44:24.701000 385220 site-packages/torch/_opaque_base.py:6] torch._opaque_base is deprecated, use torch._custom_class_base instead
+W1122 13:44:24.702000 385220 site-packages/torch/_library/opaque_object.py:288] register_opaque_type is deprecated, use register_custom_class instead
+W1122 13:44:24.702000 385220 site-packages/torch/_library/opaque_object.py:211] typ='value' is deprecated, use typ='constant' instead
+FlashInfer kernels are disabled: flashinfer-cubin is not installed and nvcc (CUDA_HOME, CUDA_PATH, PATH or /usr/local/cuda) or ninja (PATH) is missing. Set CUDA_HOME to a CUDA toolkit and put ninja on PATH, or run `vllm download-kernels`.
+(APIServer pid=385220) INFO 11-22 13:44:30 [startup.py:38] 
+(APIServer pid=385220) INFO 11-22 13:44:30 [startup.py:38]        █     █     █▄   ▄█
+(APIServer pid=385220) INFO 11-22 13:44:30 [startup.py:38]  ▄▄ ▄█ █     █     █ ▀▄▀ █  version 0.34.0
+(APIServer pid=385220) INFO 11-22 13:44:30 [startup.py:38]   █▄█▀ █     █     █     █  model   Qwen/Qwen3-8B-AWQ
+(APIServer pid=385220) INFO 11-22 13:44:30 [startup.py:38]    ▀▀  ▀▀▀▀▀ ▀▀▀▀▀ ▀     ▀
+(APIServer pid=385220) INFO 11-22 13:44:30 [startup.py:38] 
+(APIServer pid=385220) INFO 11-22 13:44:30 [startup.py:96] non-default args: {'model_tag': 'Qwen/Qwen3-8B-AWQ', 'host': '127.0.0.1', 'model': 'Qwen/Qwen3-8B-AWQ', 'max_model_len': 4096, 'gpu_memory_utilization': 0.86, 'enable_extensible_kv_cache': False, 'enable_prefix_caching': False, 'max_num_seqs': 64}
+(APIServer pid=385220) INFO 11-22 13:44:32 [model.py:761] Resolved architecture: Qwen3ForCausalLM
+(APIServer pid=385220) INFO 11-22 13:44:32 [model.py:2214] Using max model len 4096
+Parse safetensors files:   0%|          | 0/2 [00:00<?, ?it/s]Parse safetensors files:  50%|█████     | 1/2 [00:00<00:00,  1.11it/s]Parse safetensors files: 100%|██████████| 2/2 [00:01<00:00,  1.41it/s]Parse safetensors files: 100%|██████████| 2/2 [00:01<00:00,  1.36it/s]
+(APIServer pid=385220) INFO 11-22 13:44:34 [kernel.py:517] Final IR op priority after setting platform defaults: IrOpPriorityConfig(rms_norm=['native'], fused_add_rms_norm=['native'], gelu_and_mul_sparse=['triton', 'native'])
+Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]Fetching 10 files: 100%|██████████| 10/10 [00:00<00:00, 2708.80it/s]
+(APIServer pid=385220) INFO 11-22 13:44:36 [numa_utils.py:575] Automatic NUMA binding unavailable on this host; starting unbound. Enable debug logging for the skip reason.
+W1122 13:44:37.779000 385718 site-packages/torch/_opaque_base.py:6] torch._opaque_base is deprecated, use torch._custom_class_base instead
+W1122 13:44:37.779000 385718 site-packages/torch/_library/opaque_object.py:288] register_opaque_type is deprecated, use register_custom_class instead
+W1122 13:44:37.780000 385718 site-packages/torch/_library/opaque_object.py:211] typ='value' is deprecated, use typ='constant' instead
+FlashInfer kernels are disabled: flashinfer-cubin is not installed and nvcc (CUDA_HOME, CUDA_PATH, PATH or /usr/local/cuda) or ninja (PATH) is missing. Set CUDA_HOME to a CUDA toolkit and put ninja on PATH, or run `vllm download-kernels`.
+(EngineCore pid=385718) INFO 11-22 13:44:43 [core.py:153] Initializing a V1 LLM engine (v0.34.0) with config: model='Qwen/Qwen3-8B-AWQ', speculative_config=None, tokenizer='Qwen/Qwen3-8B-AWQ', skip_tokenizer_init=False, tokenizer_mode=auto, revision=main, tokenizer_revision=main, trust_remote_code=False, dtype=torch.float16, max_seq_len=4096, download_dir=None, load_format=auto, tensor_parallel_size=1, pipeline_parallel_size=1, data_parallel_size=1, decode_context_parallel_size=1, dcp_comm_backend=ag_rs, disable_custom_all_reduce=False, quantization=auto_awq, quantization_config=None, enforce_eager=False, aux_output_config=AuxOutputConfig(enable_return_routed_experts=False, max_bytes=None), kv_cache_dtype=auto, device_config=cuda, structured_outputs_config=StructuredOutputsConfig(backend='auto', disable_any_whitespace=False, disable_additional_properties=False, reasoning_parser='', reasoning_parser_plugin='', enable_in_reasoning=False), observability_config=ObservabilityConfig(show_hidden_metrics_for_version=None, otlp_traces_endpoint=None, collect_detailed_traces=None, per_request_spec_decode_metrics='none', kv_cache_metrics=False, kv_cache_metrics_sample=0.01, custom_histogram_buckets=None, cudagraph_metrics=False, enable_layerwise_nvtx_tracing=False, enable_mfu_metrics=False, enable_mm_processor_stats=False, enable_logging_iteration_details=False, jit_monitor_mode='warn', jit_monitor_verbose=False), seed=0, served_model_name=Qwen/Qwen3-8B-AWQ, enable_prefix_caching=False, enable_chunked_prefill=True, pooler_config=None, compilation_config={'mode': <CompilationMode.VLLM_COMPILE: 3>, 'debug_dump_path': None, 'cache_dir': '', 'compile_cache_save_format': 'binary', 'backend': 'inductor', 'custom_ops': ['none'], 'ir_enable_torch_wrap': True, 'splitting_ops': ['vllm::unified_attention_with_output', 'vllm::unified_mla_attention_with_output', 'vllm::mamba_mixer2', 'vllm::mamba_mixer', 'vllm::short_conv', 'vllm::zaya_cca', 'vllm::qwen4_exp_ple_short_conv', 'vllm::qwen4_exp_qsa_with_output', 'vllm::qwen4_exp_qsa_prepare_with_output', 'vllm::linear_attention', 'vllm::qwen_gdn_attention_core', 'vllm::qwen_gdn_attention_core_fused_norm_packed', 'vllm::gdn_attention_core_xpu', 'vllm::olmo_hybrid_gdn_full_forward', 'vllm::sparse_attn_indexer', 'vllm::rocm_aiter_sparse_attn_indexer', 'vllm::deepseek_v4_attention', 'vllm::hpc_rope_norm_forward', 'vllm::step5_csa_attention', 'vllm::unified_kv_cache_update', 'vllm::unified_mla_kv_cache_update'], 'compile_mm_encoder': False, 'cudagraph_mm_encoder': False, 'encoder_cudagraph_token_budgets': [], 'encoder_cudagraph_max_token_budget': 5120, 'encoder_cudagraph_max_vision_items_per_batch': 0, 'encoder_cudagraph_max_frames_per_batch': None, 'cudagraph_decoder_replay': True, 'decoder_replay_cudagraph_capture_sizes': [], 'decoder_replay_trim_threshold': 768, 'compile_sizes': [], 'compile_ranges_endpoints': [2048], 'inductor_compile_config': {'enable_auto_functionalized_v2': False, 'combo_kernels': True, 'benchmark_combo_kernel': True}, 'inductor_passes': {}, 'cudagraph_mode': <CUDAGraphMode.FULL_AND_PIECEWISE: (2, 1)>, 'use_breakable_cudagraph': False, 'cudagraph_num_of_warmups': 1, 'cudagraph_capture_sizes': [1, 2, 4, 8, 16, 24, 32, 40, 48, 56, 64, 72, 80, 88, 96, 104, 112, 120, 128], 'prefill_cudagraph_capture_token_sizes': [1, 2, 4, 8, 16, 24, 32, 40, 48, 56, 64, 72, 80, 88, 96, 104, 112, 120, 128], 'max_prefill_cudagraph_capture_tokens': 128, 'decode_cudagraph_capture_request_sizes': [1, 2, 4, 8, 16, 24, 32, 40, 48, 56, 64], 'max_decode_cudagraph_capture_requests': 64, 'max_decode_cudagraph_capture_tokens': None, 'cudagraph_copy_inputs': False, 'cudagraph_specialize_lora': True, 'use_inductor_graph_partition': False, 'pass_config': {'fuse_norm_quant': False, 'fuse_act_quant': False, 'fuse_attn_quant': False, 'fuse_allreduce_rms': False, 'enable_qk_norm_rope_fusion': False, 'fuse_rope_kvcache_cat_mla': False, 'fuse_act_padding': False, 'fuse_qk_norm_rope_kvcache': False}, 'max_cudagraph_capture_size': 128, 'dynamic_shapes_config': {'type': <DynamicShapesType.BACKED: 'backed'>, 'evaluate_guards': False, 'assume_32_bit_indexing': False}, 'local_cache_dir': None, 'fast_moe_cold_start': False, 'static_all_moe_layers': []}, kernel_config=KernelConfig(ir_op_priority=IrOpPriorityConfig(rms_norm=['native'], fused_add_rms_norm=['native'], gelu_and_mul_sparse=['triton', 'native']), enable_flashinfer_autotune=True, enable_rocm_segmented_attn_autotune=False, enable_rocm_aiter_gemm_warmup=False, enable_cutedsl_warmup=True, enable_jit_warmup=True, monokernel=False, moe_backend='auto', sparse_indexer_topk_backend='auto', linear_backend='auto', linear_backend_per_quant=None, rdna_hybrid_w4a16_prefill_dequant='disable')
+(EngineCore pid=385718) INFO 11-22 13:44:43 [parallel_state.py:1935] world_size=1 rank=0 local_rank=0 distributed_init_method=file:///tmp/vllm_dist_1e4593f117fb4441aeb910c9f9a06486 backend=nccl
+(EngineCore pid=385718) INFO 11-22 13:44:43 [parallel_state.py:2394] rank 0 in world size 1 is assigned as DP rank 0, PP rank 0, PCP rank 0, TP rank 0, ETP rank 0, EP rank N/A, EPLB rank N/A
+(EngineCore pid=385718) INFO 11-22 13:44:43 [cuda.py:239] NVIDIA Confidential Computing not detected via NVML
+(EngineCore pid=385718) INFO 11-22 13:44:44 [model_runner.py:412] Loading model from scratch...
+(EngineCore pid=385718) INFO 11-22 13:44:44 [__init__.py:949] Using MarlinLinearKernel for mixed-precision linear
+(EngineCore pid=385718) INFO 11-22 13:44:44 [auto_awq.py:457] Using MarlinLinearKernel for AutoAWQMarlinLinearMethod
+(EngineCore pid=385718) INFO 11-22 13:44:44 [cuda.py:549] Using FLASH_ATTN attention backend out of potential backends: ['FLASH_ATTN', 'FLASHINFER', 'TRITON_ATTN', 'FLEX_ATTENTION'].
+(EngineCore pid=385718) INFO 11-22 13:44:44 [flash_attn.py:1131] Using FlashAttention version 2
+(EngineCore pid=385718) INFO 11-22 13:44:44 [base_loader.py:95] Initializing model took 0.714133 seconds
+(EngineCore pid=385718) INFO 11-22 13:44:45 [weight_utils.py:1154] Filesystem type for checkpoints: EXT4. Checkpoint size: 5.68 GiB. Available RAM: 50.65 GiB.
+(EngineCore pid=385718) INFO 11-22 13:44:45 [weight_utils.py:1177] Auto-prefetch is disabled because the filesystem (EXT4) is not a recognized network FS (NFS/Lustre). If you want to force prefetching, start vLLM with --safetensors-load-strategy=prefetch.
+Loading safetensors checkpoint shards:   0% Completed | 0/2 [00:00<?, ?it/s]
+(EngineCore pid=385718) WARNING 11-22 13:44:45 [utils.py:345] Attempted to load weight embed_tokens.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.0.input_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.0.mlp.down_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.0.post_attention_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.0.self_attn.k_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.0.self_attn.o_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.0.self_attn.q_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.1.input_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.1.mlp.down_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.1.post_attention_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.1.self_attn.k_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.1.self_attn.o_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.1.self_attn.q_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.10.input_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.10.mlp.down_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.10.post_attention_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.10.self_attn.k_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.10.self_attn.o_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.10.self_attn.q_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.11.input_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.11.mlp.down_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.11.post_attention_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.11.self_attn.k_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.11.self_attn.o_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.11.self_attn.q_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.12.input_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.12.mlp.down_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.12.post_attention_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.12.self_attn.k_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.12.self_attn.o_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.12.self_attn.q_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.13.input_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.13.mlp.down_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.13.post_attention_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.13.self_attn.k_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.13.self_attn.o_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.13.self_attn.q_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.14.input_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.14.mlp.down_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.14.post_attention_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.14.self_attn.k_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.14.self_attn.o_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.14.self_attn.q_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.15.input_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.15.mlp.down_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.15.post_attention_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.15.self_attn.k_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.15.self_attn.o_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.15.self_attn.q_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.16.input_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.16.mlp.down_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.16.post_attention_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.16.self_attn.k_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.16.self_attn.o_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.16.self_attn.q_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.17.input_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.17.mlp.down_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.17.post_attention_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.17.self_attn.k_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.17.self_attn.o_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.17.self_attn.q_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.18.input_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.18.mlp.down_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.18.post_attention_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.18.self_attn.k_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.18.self_attn.o_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.18.self_attn.q_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.19.input_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.19.mlp.down_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.19.post_attention_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.19.self_attn.k_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.19.self_attn.o_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.19.self_attn.q_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.2.input_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.2.mlp.down_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.2.post_attention_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.2.self_attn.k_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.2.self_attn.o_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.2.self_attn.q_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.20.input_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.20.mlp.down_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.20.post_attention_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.20.self_attn.k_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.20.self_attn.o_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.20.self_attn.q_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.21.input_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.21.mlp.down_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.21.post_attention_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.21.self_attn.k_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.21.self_attn.o_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.21.self_attn.q_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.22.input_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.22.mlp.down_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.22.post_attention_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.22.self_attn.k_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.22.self_attn.o_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.22.self_attn.q_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.23.input_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.23.mlp.down_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.23.post_attention_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.23.self_attn.k_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.23.self_attn.o_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.23.self_attn.q_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.24.input_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.24.mlp.down_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.24.post_attention_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.24.self_attn.k_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.24.self_attn.o_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.24.self_attn.q_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.25.input_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.25.mlp.down_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.25.post_attention_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.25.self_attn.k_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.25.self_attn.o_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.25.self_attn.q_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.26.input_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.26.mlp.down_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.26.post_attention_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.26.self_attn.k_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.26.self_attn.o_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.26.self_attn.q_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.27.input_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.27.mlp.down_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.27.post_attention_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.27.self_attn.k_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.27.self_attn.o_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.27.self_attn.q_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.28.input_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.28.mlp.down_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.28.post_attention_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.28.self_attn.k_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.28.self_attn.o_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.28.self_attn.q_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.29.input_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.29.mlp.down_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.29.post_attention_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.29.self_attn.k_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.29.self_attn.o_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.29.self_attn.q_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.3.input_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.3.mlp.down_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.3.post_attention_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.3.self_attn.k_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.3.self_attn.o_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.3.self_attn.q_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.30.input_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.30.mlp.down_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.30.post_attention_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.30.self_attn.k_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.30.self_attn.o_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.30.self_attn.q_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+[rank0]:[W1122 13:44:46.242887618 CUDACachingAllocator.cpp:3934] memory allocation failed with OOM on device 0 while trying to allocate 20971520 bytes (free: 245366784, total: 8222998528).
+[rank0]:[W1122 13:44:46.246499412 CUDACachingAllocator.cpp:3934] memory allocation failed with OOM on device 0 while trying to allocate 20971520 bytes (free: 245366784, total: 8222998528).
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.31.input_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.31.mlp.down_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.31.post_attention_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.31.self_attn.k_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+[rank0]:[W1122 13:44:46.257860258 CUDACachingAllocator.cpp:3934] memory allocation failed with OOM on device 0 while trying to allocate 20971520 bytes (free: 245366784, total: 8222998528).
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.31.self_attn.o_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.31.self_attn.q_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+[rank0]:[W1122 13:44:46.261088971 CUDACachingAllocator.cpp:3934] memory allocation failed with OOM on device 0 while trying to allocate 20971520 bytes (free: 245366784, total: 8222998528).
+[rank0]:[W1122 13:44:46.264415979 CUDACachingAllocator.cpp:3934] memory allocation failed with OOM on device 0 while trying to allocate 20971520 bytes (free: 245366784, total: 8222998528).
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.32.input_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.32.mlp.down_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.32.post_attention_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.32.self_attn.k_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+[rank0]:[W1122 13:44:46.275779315 CUDACachingAllocator.cpp:3934] memory allocation failed with OOM on device 0 while trying to allocate 20971520 bytes (free: 245366784, total: 8222998528).
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.32.self_attn.o_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.32.self_attn.q_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+[rank0]:[W1122 13:44:46.280742354 CUDACachingAllocator.cpp:3934] memory allocation failed with OOM on device 0 while trying to allocate 20971520 bytes (free: 245366784, total: 8222998528).
+[rank0]:[W1122 13:44:46.283610534 CUDACachingAllocator.cpp:3934] memory allocation failed with OOM on device 0 while trying to allocate 20971520 bytes (free: 245366784, total: 8222998528).
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.33.input_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.33.mlp.down_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.33.post_attention_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.33.self_attn.k_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+[rank0]:[W1122 13:44:46.295582530 CUDACachingAllocator.cpp:3934] memory allocation failed with OOM on device 0 while trying to allocate 20971520 bytes (free: 245366784, total: 8222998528).
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.33.self_attn.o_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.33.self_attn.q_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+[rank0]:[W1122 13:44:46.299325848 CUDACachingAllocator.cpp:3934] memory allocation failed with OOM on device 0 while trying to allocate 20971520 bytes (free: 245366784, total: 8222998528).
+[rank0]:[W1122 13:44:46.302487054 CUDACachingAllocator.cpp:3934] memory allocation failed with OOM on device 0 while trying to allocate 20971520 bytes (free: 245366784, total: 8222998528).
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.34.input_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.34.mlp.down_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.34.post_attention_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.34.self_attn.k_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+[rank0]:[W1122 13:44:46.314387145 CUDACachingAllocator.cpp:3934] memory allocation failed with OOM on device 0 while trying to allocate 20971520 bytes (free: 245366784, total: 8222998528).
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.34.self_attn.o_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.34.self_attn.q_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+[rank0]:[W1122 13:44:46.318136392 CUDACachingAllocator.cpp:3934] memory allocation failed with OOM on device 0 while trying to allocate 20971520 bytes (free: 245366784, total: 8222998528).
+[rank0]:[W1122 13:44:46.321442951 CUDACachingAllocator.cpp:3934] memory allocation failed with OOM on device 0 while trying to allocate 20971520 bytes (free: 245366784, total: 8222998528).
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.35.input_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.35.mlp.down_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.35.post_attention_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.35.self_attn.k_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+[rank0]:[W1122 13:44:46.333585229 CUDACachingAllocator.cpp:3934] memory allocation failed with OOM on device 0 while trying to allocate 20971520 bytes (free: 245366784, total: 8222998528).
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.35.self_attn.o_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.35.self_attn.q_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+[rank0]:[W1122 13:44:46.337424712 CUDACachingAllocator.cpp:3934] memory allocation failed with OOM on device 0 while trying to allocate 20971520 bytes (free: 245366784, total: 8222998528).
+[rank0]:[W1122 13:44:46.340532381 CUDACachingAllocator.cpp:3934] memory allocation failed with OOM on device 0 while trying to allocate 20971520 bytes (free: 245366784, total: 8222998528).
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.4.input_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.4.mlp.down_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.4.post_attention_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.4.self_attn.k_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+[rank0]:[W1122 13:44:46.352085598 CUDACachingAllocator.cpp:3934] memory allocation failed with OOM on device 0 while trying to allocate 20971520 bytes (free: 245366784, total: 8222998528).
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.4.self_attn.o_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.4.self_attn.q_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+[rank0]:[W1122 13:44:46.356307602 CUDACachingAllocator.cpp:3934] memory allocation failed with OOM on device 0 while trying to allocate 20971520 bytes (free: 245366784, total: 8222998528).
+[rank0]:[W1122 13:44:46.359500047 CUDACachingAllocator.cpp:3934] memory allocation failed with OOM on device 0 while trying to allocate 20971520 bytes (free: 245366784, total: 8222998528).
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.5.input_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.5.mlp.down_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.5.post_attention_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.5.self_attn.k_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+[rank0]:[W1122 13:44:46.371254624 CUDACachingAllocator.cpp:3934] memory allocation failed with OOM on device 0 while trying to allocate 20971520 bytes (free: 245366784, total: 8222998528).
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.5.self_attn.o_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.5.self_attn.q_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+[rank0]:[W1122 13:44:46.375282258 CUDACachingAllocator.cpp:3934] memory allocation failed with OOM on device 0 while trying to allocate 20971520 bytes (free: 245366784, total: 8222998528).
+[rank0]:[W1122 13:44:46.378513570 CUDACachingAllocator.cpp:3934] memory allocation failed with OOM on device 0 while trying to allocate 20971520 bytes (free: 245366784, total: 8222998528).
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.6.input_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.6.mlp.down_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.6.post_attention_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.6.self_attn.k_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+[rank0]:[W1122 13:44:46.389888236 CUDACachingAllocator.cpp:3934] memory allocation failed with OOM on device 0 while trying to allocate 20971520 bytes (free: 245366784, total: 8222998528).
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.6.self_attn.o_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.6.self_attn.q_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+[rank0]:[W1122 13:44:46.394542110 CUDACachingAllocator.cpp:3934] memory allocation failed with OOM on device 0 while trying to allocate 20971520 bytes (free: 245366784, total: 8222998528).
+[rank0]:[W1122 13:44:46.397562322 CUDACachingAllocator.cpp:3934] memory allocation failed with OOM on device 0 while trying to allocate 20971520 bytes (free: 245366784, total: 8222998528).
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.7.input_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.7.mlp.down_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.7.post_attention_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.7.self_attn.k_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+[rank0]:[W1122 13:44:46.410039494 CUDACachingAllocator.cpp:3934] memory allocation failed with OOM on device 0 while trying to allocate 20971520 bytes (free: 245366784, total: 8222998528).
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.7.self_attn.o_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.7.self_attn.q_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+[rank0]:[W1122 13:44:46.414276598 CUDACachingAllocator.cpp:3934] memory allocation failed with OOM on device 0 while trying to allocate 20971520 bytes (free: 245366784, total: 8222998528).
+[rank0]:[W1122 13:44:46.417410945 CUDACachingAllocator.cpp:3934] memory allocation failed with OOM on device 0 while trying to allocate 20971520 bytes (free: 245366784, total: 8222998528).
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.8.input_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.8.mlp.down_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.8.post_attention_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.8.self_attn.k_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+[rank0]:[W1122 13:44:46.428949173 CUDACachingAllocator.cpp:3934] memory allocation failed with OOM on device 0 while trying to allocate 20971520 bytes (free: 245366784, total: 8222998528).
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.8.self_attn.o_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.8.self_attn.q_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+[rank0]:[W1122 13:44:46.433298651 CUDACachingAllocator.cpp:3934] memory allocation failed with OOM on device 0 while trying to allocate 20971520 bytes (free: 245366784, total: 8222998528).
+[rank0]:[W1122 13:44:46.436506755 CUDACachingAllocator.cpp:3934] memory allocation failed with OOM on device 0 while trying to allocate 20971520 bytes (free: 245366784, total: 8222998528).
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.9.input_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.9.mlp.down_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.9.post_attention_layernorm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.9.self_attn.k_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+[rank0]:[W1122 13:44:46.448192196 CUDACachingAllocator.cpp:3934] memory allocation failed with OOM on device 0 while trying to allocate 20971520 bytes (free: 245366784, total: 8222998528).
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.9.self_attn.o_proj.scales with dtype torch.bfloat16 into parameter with dtype torch.float16
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight layers.9.self_attn.q_norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+[rank0]:[W1122 13:44:46.452246578 CUDACachingAllocator.cpp:3934] memory allocation failed with OOM on device 0 while trying to allocate 20971520 bytes (free: 245366784, total: 8222998528).
+[rank0]:[W1122 13:44:46.455465651 CUDACachingAllocator.cpp:3934] memory allocation failed with OOM on device 0 while trying to allocate 20971520 bytes (free: 245366784, total: 8222998528).
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight norm.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+Loading safetensors checkpoint shards:  50% Completed | 1/2 [00:00<00:00,  1.18it/s]
+(EngineCore pid=385718) WARNING 11-22 13:44:46 [utils.py:345] Attempted to load weight lm_head.weight with dtype torch.bfloat16 into parameter with dtype torch.float16
+Loading safetensors checkpoint shards: 100% Completed | 2/2 [00:01<00:00,  1.78it/s]
+Loading safetensors checkpoint shards: 100% Completed | 2/2 [00:01<00:00,  1.66it/s]
+
+(EngineCore pid=385718) INFO 11-22 13:44:47 [default_loader.py:543] Loading weights took 1.23 seconds
+(EngineCore pid=385718) INFO 11-22 13:44:49 [model_runner.py:441] Model loading took 5.71 GiB memory and 5.183568 seconds
+(EngineCore pid=385718) WARNING 11-22 13:44:49 [topk_topp_sampler.py:126] FlashInfer top-p/top-k sampling unavailable: FlashInfer kernels are disabled; falling back. Set VLLM_USE_FLASHINFER_SAMPLER=0 to silence.
+(EngineCore pid=385718) INFO 11-22 13:44:49 [torch_utils.py:301] Reducing Torch threads from 16 to 1 for serving. Set OMP_NUM_THREADS in the external environment to override.
+(EngineCore pid=385718) INFO 11-22 13:44:49 [utils.py:419] Using LBNHC KV cache layout.
+(EngineCore pid=385718) INFO 11-22 13:44:50 [caching.py:368] reconstructed serializable fn from standalone compile artifacts. num_artifacts=3 num_submods=37
+(EngineCore pid=385718) INFO 11-22 13:44:50 [decorators.py:326] [backbone] Directly load AOT compilation from path /home/earth/.cache/vllm/torch_compile_cache/torch_aot_compile/4b1b038d753903ee31b4d1bc2d5e39c8de3943f46c6b9d6a7d8e93026ef730cb/rank_0_0/model
+(EngineCore pid=385718) INFO 11-22 13:44:50 [monitor.py:62] [backbone] torch.compile took 0.16 s in total
+(EngineCore pid=385718) INFO 11-22 13:44:50 [monitor.py:91] [backbone] Initial profiling/warmup run took 0.02 s
+Capturing CUDA graphs (PIECEWISE):   0%|          | 0/19 [00:00<?, ?it/s]Capturing CUDA graphs (PIECEWISE):  11%|█         | 2/19 [00:00<00:01, 10.48it/s]Capturing CUDA graphs (PIECEWISE):  21%|██        | 4/19 [00:00<00:01, 11.11it/s]Capturing CUDA graphs (PIECEWISE):  32%|███▏      | 6/19 [00:00<00:01, 11.68it/s]Capturing CUDA graphs (PIECEWISE):  42%|████▏     | 8/19 [00:00<00:00, 12.12it/s]Capturing CUDA graphs (PIECEWISE):  53%|█████▎    | 10/19 [00:00<00:00, 13.94it/s]Capturing CUDA graphs (PIECEWISE):  68%|██████▊   | 13/19 [00:00<00:00, 17.15it/s]Capturing CUDA graphs (PIECEWISE):  84%|████████▍ | 16/19 [00:01<00:00, 20.08it/s]Capturing CUDA graphs (PIECEWISE): 100%|██████████| 19/19 [00:01<00:00, 22.35it/s]Capturing CUDA graphs (PIECEWISE): 100%|██████████| 19/19 [00:01<00:00, 16.93it/s]
+Capturing CUDA graphs (FULL):   0%|          | 0/2 [00:00<?, ?it/s]Capturing CUDA graphs (FULL): 100%|██████████| 2/2 [00:00<00:00, 22.94it/s]
+(EngineCore pid=385718) INFO 11-22 13:44:53 [model_runner.py:1216] Graph capturing finished in 2 secs, took 0.15 GiB
+(EngineCore pid=385718) INFO 11-22 13:44:53 [gpu_worker.py:795] Available KV cache memory: 0.43 GiB
+(EngineCore pid=385718) INFO 11-22 13:44:53 [gpu_worker.py:809] CUDA graph memory profiling is enabled (default since v0.21.0). The current --gpu-memory-utilization=0.8600 is equivalent to --gpu-memory-utilization=0.8365 without CUDA graph memory profiling. To maintain the same effective KV cache size as before, increase --gpu-memory-utilization to 0.8835. To disable, set VLLM_MEMORY_PROFILER_ESTIMATE_CUDAGRAPHS=0.
+(EngineCore pid=385718) ERROR 11-22 13:44:53 [core.py:1757] EngineCore failed to start.
+(EngineCore pid=385718) ERROR 11-22 13:44:53 [core.py:1757] Traceback (most recent call last):
+(EngineCore pid=385718) ERROR 11-22 13:44:53 [core.py:1757]   File "/media/earth/SSD2/llm-serving/envs/serve-vllm/lib/python3.12/site-packages/vllm/v1/engine/core.py", line 1728, in run_engine_core
+(EngineCore pid=385718) ERROR 11-22 13:44:53 [core.py:1757]     engine_core = EngineCoreProc(*args, engine_index=dp_rank, **kwargs)
+(EngineCore pid=385718) ERROR 11-22 13:44:53 [core.py:1757]                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=385718) ERROR 11-22 13:44:53 [core.py:1757]   File "/media/earth/SSD2/llm-serving/envs/serve-vllm/lib/python3.12/site-packages/vllm/tracing/otel.py", line 175, in sync_wrapper
+(EngineCore pid=385718) ERROR 11-22 13:44:53 [core.py:1757]     return func(*args, **kwargs)
+(EngineCore pid=385718) ERROR 11-22 13:44:53 [core.py:1757]            ^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=385718) ERROR 11-22 13:44:53 [core.py:1757]   File "/media/earth/SSD2/llm-serving/envs/serve-vllm/lib/python3.12/site-packages/vllm/v1/engine/core.py", line 1399, in __init__
+(EngineCore pid=385718) ERROR 11-22 13:44:53 [core.py:1757]     super().__init__(
+(EngineCore pid=385718) ERROR 11-22 13:44:53 [core.py:1757]   File "/media/earth/SSD2/llm-serving/envs/serve-vllm/lib/python3.12/site-packages/vllm/v1/engine/core.py", line 177, in __init__
+(EngineCore pid=385718) ERROR 11-22 13:44:53 [core.py:1757]     kv_cache_config = self._initialize_kv_caches(vllm_config)
+(EngineCore pid=385718) ERROR 11-22 13:44:53 [core.py:1757]                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=385718) ERROR 11-22 13:44:53 [core.py:1757]   File "/media/earth/SSD2/llm-serving/envs/serve-vllm/lib/python3.12/site-packages/vllm/tracing/otel.py", line 175, in sync_wrapper
+(EngineCore pid=385718) ERROR 11-22 13:44:53 [core.py:1757]     return func(*args, **kwargs)
+(EngineCore pid=385718) ERROR 11-22 13:44:53 [core.py:1757]            ^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=385718) ERROR 11-22 13:44:53 [core.py:1757]   File "/media/earth/SSD2/llm-serving/envs/serve-vllm/lib/python3.12/site-packages/vllm/v1/engine/core.py", line 349, in _initialize_kv_caches
+(EngineCore pid=385718) ERROR 11-22 13:44:53 [core.py:1757]     kv_cache_configs = get_kv_cache_configs(
+(EngineCore pid=385718) ERROR 11-22 13:44:53 [core.py:1757]                        ^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=385718) ERROR 11-22 13:44:53 [core.py:1757]   File "/media/earth/SSD2/llm-serving/envs/serve-vllm/lib/python3.12/site-packages/vllm/v1/core/kv_cache_planning.py", line 1656, in get_kv_cache_configs
+(EngineCore pid=385718) ERROR 11-22 13:44:53 [core.py:1757]     _check_enough_kv_cache_memory(
+(EngineCore pid=385718) ERROR 11-22 13:44:53 [core.py:1757]   File "/media/earth/SSD2/llm-serving/envs/serve-vllm/lib/python3.12/site-packages/vllm/v1/core/kv_cache_planning.py", line 124, in _check_enough_kv_cache_memory
+(EngineCore pid=385718) ERROR 11-22 13:44:53 [core.py:1757]     raise ValueError(
+(EngineCore pid=385718) ERROR 11-22 13:44:53 [core.py:1757] ValueError: To serve at least one request with the model's max seq len (4096), (0.56 GiB KV cache is needed, which is larger than the available KV cache memory (0.43 GiB). Based on the available memory, the estimated maximum model length is 3072. Try increasing `gpu_memory_utilization` when initializing the engine (this flag also controls CPU memory reservation on the CPU backend, despite its name). Decreasing `max_model_len` also reduces what is needed. See https://docs.vllm.ai/en/latest/configuration/conserving_memory/ for more details.
+Process EngineCore:
+Traceback (most recent call last):
+  File "/media/earth/SSD2/llm-serving/envs/serve-vllm/lib/python3.12/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/media/earth/SSD2/llm-serving/envs/serve-vllm/lib/python3.12/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/media/earth/SSD2/llm-serving/envs/serve-vllm/lib/python3.12/site-packages/vllm/v1/engine/core.py", line 1761, in run_engine_core
+    raise e
+  File "/media/earth/SSD2/llm-serving/envs/serve-vllm/lib/python3.12/site-packages/vllm/v1/engine/core.py", line 1728, in run_engine_core
+    engine_core = EngineCoreProc(*args, engine_index=dp_rank, **kwargs)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/media/earth/SSD2/llm-serving/envs/serve-vllm/lib/python3.12/site-packages/vllm/tracing/otel.py", line 175, in sync_wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/media/earth/SSD2/llm-serving/envs/serve-vllm/lib/python3.12/site-packages/vllm/v1/engine/core.py", line 1399, in __init__
+    super().__init__(
+  File "/media/earth/SSD2/llm-serving/envs/serve-vllm/lib/python3.12/site-packages/vllm/v1/engine/core.py", line 177, in __init__
+    kv_cache_config = self._initialize_kv_caches(vllm_config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/media/earth/SSD2/llm-serving/envs/serve-vllm/lib/python3.12/site-packages/vllm/tracing/otel.py", line 175, in sync_wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/media/earth/SSD2/llm-serving/envs/serve-vllm/lib/python3.12/site-packages/vllm/v1/engine/core.py", line 349, in _initialize_kv_caches
+    kv_cache_configs = get_kv_cache_configs(
+                       ^^^^^^^^^^^^^^^^^^^^^
+  File "/media/earth/SSD2/llm-serving/envs/serve-vllm/lib/python3.12/site-packages/vllm/v1/core/kv_cache_planning.py", line 1656, in get_kv_cache_configs
+    _check_enough_kv_cache_memory(
+  File "/media/earth/SSD2/llm-serving/envs/serve-vllm/lib/python3.12/site-packages/vllm/v1/core/kv_cache_planning.py", line 124, in _check_enough_kv_cache_memory
+    raise ValueError(
+ValueError: To serve at least one request with the model's max seq len (4096), (0.56 GiB KV cache is needed, which is larger than the available KV cache memory (0.43 GiB). Based on the available memory, the estimated maximum model length is 3072. Try increasing `gpu_memory_utilization` when initializing the engine (this flag also controls CPU memory reservation on the CPU backend, despite its name). Decreasing `max_model_len` also reduces what is needed. See https://docs.vllm.ai/en/latest/configuration/conserving_memory/ for more details.
+(APIServer pid=385220) INFO 11-22 13:44:54 [utils.py:628] [shutdown] Process manager: send sigterm to process EngineCore
+Traceback (most recent call last):
+  File "/media/earth/SSD2/llm-serving/envs/serve-vllm/bin/vllm", line 10, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/media/earth/SSD2/llm-serving/envs/serve-vllm/lib/python3.12/site-packages/vllm/entrypoints/cli/main.py", line 117, in main
+    args.dispatch_function(args)
+  File "/media/earth/SSD2/llm-serving/envs/serve-vllm/lib/python3.12/site-packages/vllm/entrypoints/cli/serve.py", line 156, in cmd
+    uvloop.run(run_server(args))
+  File "/media/earth/SSD2/llm-serving/envs/serve-vllm/lib/python3.12/site-packages/uvloop/__init__.py", line 96, in run
+    return __asyncio.run(
+           ^^^^^^^^^^^^^^
+  File "/media/earth/SSD2/llm-serving/envs/serve-vllm/lib/python3.12/asyncio/runners.py", line 195, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "/media/earth/SSD2/llm-serving/envs/serve-vllm/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "uvloop/loop.pyx", line 1515, in uvloop.loop.Loop.run_until_complete
+  File "/media/earth/SSD2/llm-serving/envs/serve-vllm/lib/python3.12/site-packages/uvloop/__init__.py", line 48, in wrapper
+    return await main
+           ^^^^^^^^^^
+  File "/media/earth/SSD2/llm-serving/envs/serve-vllm/lib/python3.12/site-packages/vllm/entrypoints/launchers/api_server/entry.py", line 176, in run_server
+    await run_server_worker(listen_address, sock, args, **uvicorn_kwargs)
+  File "/media/earth/SSD2/llm-serving/envs/serve-vllm/lib/python3.12/site-packages/vllm/entrypoints/launchers/api_server/entry.py", line 190, in run_server_worker
+    async with build_async_engine_client(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/media/earth/SSD2/llm-serving/envs/serve-vllm/lib/python3.12/contextlib.py", line 210, in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/media/earth/SSD2/llm-serving/envs/serve-vllm/lib/python3.12/site-packages/vllm/entrypoints/launchers/api_server/entry.py", line 60, in build_async_engine_client
+    async with build_async_engine_client_from_engine_args(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/media/earth/SSD2/llm-serving/envs/serve-vllm/lib/python3.12/contextlib.py", line 210, in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/media/earth/SSD2/llm-serving/envs/serve-vllm/lib/python3.12/site-packages/vllm/entrypoints/launchers/api_server/entry.py", line 94, in build_async_engine_client_from_engine_args
+    async_llm = AsyncLLM.from_vllm_config(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/media/earth/SSD2/llm-serving/envs/serve-vllm/lib/python3.12/site-packages/vllm/v1/engine/async_llm.py", line 265, in from_vllm_config
+    return cls(
+           ^^^^
+  File "/media/earth/SSD2/llm-serving/envs/serve-vllm/lib/python3.12/site-packages/vllm/v1/engine/async_llm.py", line 194, in __init__
+    self.engine_core = EngineCoreClient.make_async_mp_client(
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/media/earth/SSD2/llm-serving/envs/serve-vllm/lib/python3.12/site-packages/vllm/tracing/otel.py", line 175, in sync_wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/media/earth/SSD2/llm-serving/envs/serve-vllm/lib/python3.12/site-packages/vllm/v1/engine/core_client.py", line 183, in make_async_mp_client
+    return AsyncMPClient(
+           ^^^^^^^^^^^^^^
+  File "/media/earth/SSD2/llm-serving/envs/serve-vllm/lib/python3.12/site-packages/vllm/tracing/otel.py", line 175, in sync_wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/media/earth/SSD2/llm-serving/envs/serve-vllm/lib/python3.12/site-packages/vllm/v1/engine/core_client.py", line 1195, in __init__
+    super().__init__(
+  File "/media/earth/SSD2/llm-serving/envs/serve-vllm/lib/python3.12/site-packages/vllm/v1/engine/core_client.py", line 729, in __init__
+    with launch_core_engines(
+         ^^^^^^^^^^^^^^^^^^^^
+  File "/media/earth/SSD2/llm-serving/envs/serve-vllm/lib/python3.12/contextlib.py", line 144, in __exit__
+    next(self.gen)
+  File "/media/earth/SSD2/llm-serving/envs/serve-vllm/lib/python3.12/site-packages/vllm/v1/engine/utils.py", line 1393, in launch_core_engines
+    wait_for_engine_startup(
+  File "/media/earth/SSD2/llm-serving/envs/serve-vllm/lib/python3.12/site-packages/vllm/v1/engine/utils.py", line 1477, in wait_for_engine_startup
+    raise RuntimeError(
+RuntimeError: Engine core initialization failed. See root cause above. Failed core proc(s): {}
