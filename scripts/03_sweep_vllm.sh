@@ -35,7 +35,12 @@ CONFIGS=(
   "14b-awq_tp2|0,1|Qwen/Qwen3-14B-AWQ|--tensor-parallel-size 2"
   "14b-awq_pp2|0,1|Qwen/Qwen3-14B-AWQ|--pipeline-parallel-size 2"
   "4b-bf16_tp2|0,1|Qwen/Qwen3-4B|--tensor-parallel-size 2"
+  "8b-w8a8_tp2|0,1|nm-testing/Qwen3-8B-W8A8-INT8|--tensor-parallel-size 2"
+  "4b-awq_1gpu|1|Qwen/Qwen3-4B-AWQ|"
+  "4b-awq_dp2|0,1|Qwen/Qwen3-4B-AWQ|--data-parallel-size 2"
 )
+# vLLM server and the bench client run on CPUSET (taskset) so other CPU work on the PC cannot skew the numbers
+CPUSET="${CPUSET:-0-19}"
 
 gpu_used() { nvidia-smi --query-gpu=memory.used --format=csv,noheader,nounits -i "$1" | tr -d ' '; }
 declare -A IDLE; for g in 0 1; do IDLE[$g]=$(gpu_used $g); done
@@ -53,44 +58,60 @@ stop_server() {  # the server runs in its own session: kill the whole process gr
 
 bench() {  # bench <logfile> <args...>: run vllm bench serve; succeed only if every request succeeded
   local log="$1"; shift
-  "$VENV/bin/vllm" bench serve --backend vllm --model "$MODEL" --host $HOST --port $PORT --dataset-name random \
+  taskset -c "$CPUSET" "$VENV/bin/vllm" bench serve --backend vllm --model "$MODEL" --host $HOST --port $PORT --dataset-name random \
     --random-range-ratio 0 --ignore-eos --temperature 0 "$@" > "$log" 2>&1 || return 1
   bench_ok "$log"
 }
 SMOKE_C=64   # a KV size is accepted only if the server also survives a burst at the highest concurrency tested
-{ echo "run_id $RUN_ID"; cat results/versions.txt 2>/dev/null; echo "common $COMMON"; echo "in $IN out $OUTLEN seed $SEED"; } > "$OUT/run.txt"
+try_start() {  # try_start <label> <kv args>: start the server; 0 = up and survived the smoke test (left running)
+  local A="$1" KVA="$2" i up=""
+  LOG="$OUT/$NAME.try-$A.log"
+  CUDA_VISIBLE_DEVICES=$GPUS setsid taskset -c "$CPUSET" "$VENV/bin/vllm" serve "$MODEL" $COMMON $KVA $EXTRA > "$LOG" 2>&1 &
+  SPID=$!
+  for i in $(seq 1 180); do
+    curl -sf "http://$HOST:$PORT/health" >/dev/null && { up=1; break; }
+    kill -0 "$SPID" 2>/dev/null || break; sleep 5
+  done
+  if [ -z "$up" ]; then
+    echo "  did not start ($A${KVA:+, $KVA}): $(grep -m1 -E 'No available memory|out of memory|Error' "$LOG" | sed 's/^.*\] //' | cut -c1-140)"
+    stop_server "$SPID" || exit 1; return 1
+  fi
+  if bench "$OUT/$NAME.try-$A.smoke.log" --random-input-len $IN --random-output-len 16 --num-prompts $((2 * SMOKE_C)) \
+       --max-concurrency $SMOKE_C && curl -sf "http://$HOST:$PORT/health" >/dev/null; then
+    echo "  ok ($A${KVA:+, $KVA}): $(grep -h 'GPU KV cache size' "$LOG" | sed 's/^.*\] //' | head -1)"; return 0
+  fi
+  echo "  started but failed the c=$SMOKE_C smoke test ($A${KVA:+, $KVA}): $(grep -m1 -E 'out of memory|Error' "$LOG" | sed 's/^.*\] //' | cut -c1-140)"
+  stop_server "$SPID" || exit 1; return 1
+}
+
+{ echo "run_id $RUN_ID"; echo "cpuset $CPUSET"; cat results/versions.txt 2>/dev/null; echo "common $COMMON"; echo "in $IN out $OUTLEN seed $SEED"; } > "$OUT/run.txt"
 for c in "${CONFIGS[@]}"; do
   IFS='|' read -r NAME GPUS MODEL EXTRA <<<"$c"
   [ -n "${ONLY:-}" ] && [[ " $ONLY " != *" $NAME "* ]] && continue
   echo "=== $NAME (GPUs $GPUS)"
   "$VENV/bin/hf" download "$MODEL" >/dev/null 2>&1 || "$VENV/bin/huggingface-cli" download "$MODEL" >/dev/null   # outside the health timeout
   wait_idle || { echo "  GPUs busy before start, stopping"; exit 1; }
-  STARTED=""; SUGGEST=""; ATTEMPTS="auto $KV_STEPS"
-  for A in $ATTEMPTS; do
-    if [ "$A" = auto ]; then KVARG=""; else
-      [ -n "$SUGGEST" ] || break
-      KVARG="--kv-cache-memory $(python3 -c "print(int($SUGGEST*$A))")"; fi
-    LOG="$OUT/$NAME.try-$A.log"
-    CUDA_VISIBLE_DEVICES=$GPUS setsid "$VENV/bin/vllm" serve "$MODEL" $COMMON $KVARG $EXTRA > "$LOG" 2>&1 &
-    SPID=$!
-    for i in $(seq 1 180); do
-      curl -sf "http://$HOST:$PORT/health" >/dev/null && { STARTED="$A"; break; }
-      kill -0 "$SPID" 2>/dev/null || break; sleep 5
+  # KV rule (same for every config): the largest KV size that both starts and survives a c=SMOKE_C burst.
+  # 1) vLLM's automatic sizing, used to read its "--kv-cache-memory=X ... to fully utilize" suggestion;
+  # 2) explicit sizes stepping down from X (KV_STEPS), first one that passes wins;
+  # 3) if no explicit size larger than the automatic one passes, fall back to the automatic size.
+  STARTED=""; KVARG=""
+  try_start auto ""; AUTO_OK=$?
+  SUGGEST=$(grep -oE -- "--kv-cache-memory=[0-9]+\` \([0-9.]+ GiB\) to fully utilize" "$LOG" | grep -oE "[0-9]{6,}" | sort -n | head -1)
+  AUTO_KV=$(grep -oE "KV cache blocks \([0-9.]+ GiB\) fit" "$LOG" | tail -1 | grep -oE "[0-9.]+" | python3 -c "import sys; v=sys.stdin.read().strip(); print(int(float(v)*2**30) if v else 0)")
+  [ $AUTO_OK = 0 ] && stop_server "$SPID"
+  if [ -n "$SUGGEST" ]; then
+    for A in $KV_STEPS; do
+      KVB=$(python3 -c "print(int($SUGGEST*$A))")
+      [ $AUTO_OK = 0 ] && [ "$KVB" -le "$AUTO_KV" ] && break      # not better than automatic sizing
+      # an explicit KV size brings back vLLM's start-up check "free memory >= utilization x total" (default 0.92),
+      # which GPU0 fails because it also drives the display; 0.85 only relaxes that check, KV size is set explicitly
+      try_start "$A" "--kv-cache-memory-bytes $KVB --gpu-memory-utilization 0.85" && { STARTED="$A"; KVARG="--kv-cache-memory-bytes $KVB --gpu-memory-utilization 0.85"; break; }
     done
-    if [ -n "$STARTED" ]; then   # started: now the load smoke test (prefill peak at SMOKE_C concurrent requests)
-      bench "$OUT/$NAME.try-$A.smoke.log" --random-input-len $IN --random-output-len 16 --num-prompts $((2 * SMOKE_C)) \
-        --max-concurrency $SMOKE_C && curl -sf "http://$HOST:$PORT/health" >/dev/null && break
-      echo "  started but failed the c=$SMOKE_C smoke test ($A${KVARG:+, $KVARG}): $(grep -m1 -E 'out of memory|Error' "$LOG" | sed 's/^.*\] //' | cut -c1-140)"
-      STARTED=""; SMOKEFAIL=1
-    fi
-    # step-down base: vLLM's "to fully utilize" suggestion, else the KV size it allocated in this attempt
-    [ -z "$SUGGEST" ] && SUGGEST=$(grep -oE -- "--kv-cache-memory=[0-9]+\` \([0-9.]+ GiB\) to fully utilize" "$LOG" | grep -oE "[0-9]{6,}" | sort -n | head -1)
-    [ -z "$SUGGEST" ] && SUGGEST=$(grep -oE "Available KV cache memory: [0-9.]+ GiB" "$LOG" | tail -1 | grep -oE "[0-9.]+" | python3 -c "import sys; v=sys.stdin.read().strip(); print(int(float(v)*2**30) if v else '')")
-    [ -z "${SMOKEFAIL:-}" ] && echo "  did not start ($A${KVARG:+, $KVARG}): $(grep -m1 -E 'No available memory|out of memory|Error' "$LOG" | sed 's/^.*\] //' | cut -c1-140)"
-    SMOKEFAIL=""; stop_server "$SPID" || exit 1
-  done
-  if [ -z "$STARTED" ]; then echo "  $NAME: does not fit (no KV size started), see $OUT/$NAME.try-*.log"; continue; fi
-  mv "$OUT/$NAME.try-$STARTED.log" "$OUT/$NAME.log"
+  fi
+  if [ -z "$STARTED" ] && [ $AUTO_OK = 0 ]; then try_start auto2 "" && STARTED=auto2; fi
+  if [ -z "$STARTED" ]; then echo "  $NAME: does not fit (no KV size started and survived load), see $OUT/$NAME.try-*.log"; continue; fi
+  cp "$OUT/$NAME.try-$STARTED.log" "$OUT/$NAME.log"
   { echo "kv_sizing $STARTED ${KVARG:-auto}"; echo "extra $EXTRA"
     grep -hE "GPU KV cache size|Maximum concurrency|Available KV cache memory|MarlinLinearKernel|Graph capturing finished|quantization|custom.?all.?reduce|CUDA graph|Model loading took" "$OUT/$NAME.log" | sed 's/^.*\] //' | sort -u
   } > "$OUT/$NAME.server.txt"
