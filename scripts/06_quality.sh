@@ -30,8 +30,9 @@ CONFIGS=(   # name|GPUs|model|extra   (quality does not depend on the GPU layout
 # ref8b: BF16 8B does not fit in 2 x 8 GiB, so 24 of 36 layers per GPU stay in host RAM and are copied in each step
 # (prefetch offload, ~0.39 s per step whatever the batch): 83 tok/s with 32 requests at once (probe 2026-11-23).
 # UVA offload (--cpu-offload-gb) re-reads host memory per batch tile: 13-15 tok/s at any batch, GSM8K timed out.
-# Automatic KV sizing fails with prefetch ("0 blocks fit"), so the KV size is given: 2.6 GiB = ~38k tokens.
-  "ref8b-bf16_tp2|0,1|Qwen/Qwen3-8B|--tensor-parallel-size 2 --offload-backend prefetch --offload-group-size 3 --offload-num-in-group 2 --kv-cache-memory-bytes 2791728742 --gpu-memory-utilization 0.85"
+# Automatic KV sizing fails with prefetch ("0 blocks fit"), so the KV size is given: 2.0 GiB = ~29k tokens, with
+# prefill steps of 1,024 tokens. (GSM8K ran with 2.6 GiB; MMLU's long prefills then ran GPU0 out of memory.)
+  "ref8b-bf16_tp2|0,1|Qwen/Qwen3-8B|--tensor-parallel-size 2 --offload-backend prefetch --offload-group-size 3 --offload-num-in-group 2 --kv-cache-memory-bytes 2147483648 --gpu-memory-utilization 0.85 --max-num-batched-tokens 1024"
   "8b-awq_tp2|0,1|Qwen/Qwen3-8B-AWQ|--tensor-parallel-size 2"
   "8b-awq_tp2_fp8kv|0,1|Qwen/Qwen3-8B-AWQ|--tensor-parallel-size 2 --kv-cache-dtype fp8"
   "8b-fp8_tp2|0,1|Qwen/Qwen3-8B-FP8|--tensor-parallel-size 2"
