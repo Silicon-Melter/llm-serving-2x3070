@@ -81,3 +81,28 @@ def test_sweep_kv_parse_takes_smallest_rank(tmp_path, text, expected):
     r = subprocess.run(["bash", str(ROOT / "scripts/03_sweep_vllm.sh"), "--parse-kv-log", str(log)],
                        capture_output=True, text=True)
     assert r.returncode == 0 and r.stdout.strip("\n") == expected, r.stdout + r.stderr
+
+
+def _stage_done(d, stage):
+    return subprocess.run(["bash", str(ROOT / "scripts/06_quality.sh"), "--stage-done", str(d), stage]).returncode == 0
+
+
+def test_quality_stage_done_rejects_files_cut_off_by_a_reset(tmp_path):
+    """After the 2026-11-23 reset, lm-eval's sample files were 0 bytes: such a stage must be redone, not skipped."""
+    import gzip
+    d = tmp_path / "cfg"; lm = d / "lm_eval" / "m"; lm.mkdir(parents=True)
+    assert not any(_stage_done(d, s) for s in ("kld", "gsm8k", "mmlu"))            # nothing there yet
+    (lm / "samples_gsm8k_x.jsonl").write_text("")                                  # 0 bytes, as after the reset
+    assert not _stage_done(d, "gsm8k")
+    (lm / "samples_gsm8k_x.jsonl").write_text('{"doc_id": 0}\n')
+    assert _stage_done(d, "gsm8k")
+    good = gzip.compress(b'{"i": 0}\n' * 2000)
+    (d / "logprobs.jsonl.gz").write_bytes(good[: len(good) // 2])                  # cut off mid-write
+    assert not _stage_done(d, "kld")
+    (d / "logprobs.jsonl.gz").write_bytes(good)
+    assert _stage_done(d, "kld")
+    for i in range(56):
+        (lm / f"samples_mmlu_s{i}_x.jsonl").write_text('{"doc_id": 0}\n')
+    assert not _stage_done(d, "mmlu")                                              # 56 of 57 subjects
+    (lm / "samples_mmlu_s56_x.jsonl").write_text('{"doc_id": 0}\n')
+    assert _stage_done(d, "mmlu")

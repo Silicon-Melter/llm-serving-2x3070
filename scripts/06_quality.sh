@@ -6,7 +6,18 @@
 # Completions endpoint, no chat template: Qwen3's thinking mode is never switched on, identically for every model.
 #   ONLY="ref4b-bf16_tp2 4b-awq_1gpu" bash scripts/06_quality.sh
 #   STAGES="kld" bash scripts/06_quality.sh        # quick screen only (Stage A)
+# Resumable: a stage whose output already exists (and is not an empty or cut-off file) is skipped, so re-running
+# with the same RUN_ID after a crash only does what is missing. FORCE=1 redoes everything.
 set -uo pipefail
+# stage_done <config dir> <stage>: 0 if that stage's output is complete. A reset can leave 0-byte or cut-off files.
+stage_done() { local d="$1"
+  case "$2" in
+    kld)   [ -s "$d/logprobs.jsonl.gz" ] && gzip -t "$d/logprobs.jsonl.gz" 2>/dev/null ;;
+    gsm8k) [ -n "$(find "$d/lm_eval" -name 'samples_gsm8k_*.jsonl' -size +0 2>/dev/null | head -1)" ] ;;
+    mmlu)  [ "$(find "$d/lm_eval" -name 'samples_mmlu_*.jsonl' -size +0 2>/dev/null | wc -l)" -ge 57 ] ;;
+    *) return 1 ;;
+  esac; }
+[ "${1:-}" = "--stage-done" ] && { stage_done "$2" "$3"; exit $?; }   # used by tests/test_scripts.py
 BULK="${BULK:-/media/earth/SSD2/llm-serving}"; VENV="$BULK/envs/serve-vllm"
 export HF_HUB_CACHE="${HF_HUB_CACHE:-$BULK/hf}"
 PORT=8000; HOST=127.0.0.1; CPUSET="${CPUSET:-0-19}"; SEED=1234
@@ -40,11 +51,15 @@ stop_server() { kill -INT -- -"$1" 2>/dev/null; for _ in $(seq 1 30); do kill -0
 
 [ -f "$CORPUS" ] || "$VENV/bin/python" scripts/07_kld.py corpus --model Qwen/Qwen3-8B-AWQ --out "$CORPUS" || exit 1
 { echo "run_id $RUN_ID"; echo "stages $STAGES"; echo "mmlu_limit $MMLU_LIMIT gsm8k_limit ${GSM8K_LIMIT:-all}"
-  echo "concurrency $CONCURRENCY"; echo "common $COMMON"; cat results/versions.txt 2>/dev/null; } > "$OUT/run.txt"
+  echo "concurrency $CONCURRENCY"; echo "common $COMMON"; echo "cpuset $CPUSET"
+  echo "started $(date -Is) commit $(git rev-parse --short HEAD 2>/dev/null)"; cat results/versions.txt 2>/dev/null; } >> "$OUT/run.txt"
 for c in "${CONFIGS[@]}"; do
   IFS='|' read -r NAME GPUS MODEL EXTRA <<<"$c"
   [ -n "${ONLY:-}" ] && [[ " $ONLY " != *" $NAME "* ]] && continue
-  echo "=== $NAME ($MODEL, GPUs $GPUS)"; D="$OUT/$NAME"; mkdir -p "$D"
+  D="$OUT/$NAME"; mkdir -p "$D"; TODO=""
+  for s in $STAGES; do { [ -z "${FORCE:-}" ] && stage_done "$D" "$s"; } || TODO="$TODO $s"; done
+  [ -z "$TODO" ] && { echo "=== $NAME: all stages already done, skipped"; continue; }
+  echo "=== $NAME ($MODEL, GPUs $GPUS), stages:$TODO"
   wait_idle || { echo "  GPUs busy before start, stopping"; exit 1; }
   CUDA_VISIBLE_DEVICES=$GPUS setsid taskset -c "$CPUSET" "$VENV/bin/vllm" serve "$MODEL" $COMMON $EXTRA > "$D/server.log" 2>&1 &
   SPID=$!; up=""
@@ -54,19 +69,20 @@ for c in "${CONFIGS[@]}"; do
     stop_server "$SPID"; continue; fi
   grep -hE "GPU KV cache size|Model loading took|kv_cache_dtype|MarlinLinearKernel|quantization" "$D/server.log" | sed 's/^.*\] //' | sort -u > "$D/server.txt"
   T0=$(date +%s)
-  if [[ " $STAGES " == *" kld "* ]]; then
+  if [[ " $TODO " == *" kld "* ]]; then
     taskset -c "$CPUSET" "$VENV/bin/python" scripts/07_kld.py collect --corpus "$CORPUS" --model "$MODEL" \
       --out "$D/logprobs.jsonl.gz" --concurrency "$CONCURRENCY" && echo "  kld: collected ($(( $(date +%s) - T0 )) s)" || echo "  kld: FAILED"
   fi
   LM="$VENV/bin/lm_eval --model local-completions --model_args model=$MODEL,base_url=http://$HOST:$PORT/v1/completions,num_concurrent=$CONCURRENCY,max_retries=3,timeout=3600,tokenized_requests=False,tokenizer=$MODEL,max_length=4096 --batch_size 1 --log_samples --seed $SEED --output_path $D/lm_eval"
-  if [[ " $STAGES " == *" gsm8k "* ]]; then T0=$(date +%s)
+  if [[ " $TODO " == *" gsm8k "* ]]; then T0=$(date +%s)
     taskset -c "$CPUSET" $LM --tasks gsm8k --num_fewshot 5 --gen_kwargs temperature=0 ${GSM8K_LIMIT:+--limit $GSM8K_LIMIT} > "$D/gsm8k.log" 2>&1 \
       && echo "  gsm8k: $(grep -E 'strict-match' "$D/gsm8k.log" | head -1 | tr -s ' ') ($(( $(date +%s) - T0 )) s)" || echo "  gsm8k: FAILED (see $D/gsm8k.log)"
   fi
-  if [[ " $STAGES " == *" mmlu "* ]]; then T0=$(date +%s)
+  if [[ " $TODO " == *" mmlu "* ]]; then T0=$(date +%s)
     taskset -c "$CPUSET" $LM --tasks mmlu --num_fewshot 5 --limit "$MMLU_LIMIT" > "$D/mmlu.log" 2>&1 \
       && echo "  mmlu: $(grep -E '^\|mmlu ' "$D/mmlu.log" | head -1 | tr -s ' ') ($(( $(date +%s) - T0 )) s)" || echo "  mmlu: FAILED (see $D/mmlu.log)"
   fi
+  sync   # results on disk before the next config (a reset lost unflushed sample files once)
   stop_server "$SPID" || { echo "  GPUs did not return to idle, stopping"; exit 1; }
 done
 echo "done: $OUT"
