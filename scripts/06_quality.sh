@@ -27,9 +27,11 @@ RUN_ID="${RUN_ID:-$(date +%Y%m%d-%H%M%S)}"; OUT="results/quality/$RUN_ID"; mkdir
 CORPUS="results/quality/corpus.json"
 COMMON="--max-model-len 4096 --max-num-seqs 32 --port $PORT --host $HOST --seed $SEED"
 CONFIGS=(   # name|GPUs|model|extra   (quality does not depend on the GPU layout, so one layout per checkpoint)
-# ref8b: 5 GiB per GPU in host RAM (read over PCIe each step, ~0.4 s) leaves ~34k KV tokens, so ~28 requests run at once.
-# With 3 GiB only 5,120 KV tokens fit (4 at once, 13 tok/s): GSM8K requests timed out overnight (run m4-18e63e5).
-  "ref8b-bf16_tp2|0,1|Qwen/Qwen3-8B|--tensor-parallel-size 2 --cpu-offload-gb 5"
+# ref8b: BF16 8B does not fit in 2 x 8 GiB, so 24 of 36 layers per GPU stay in host RAM and are copied in each step
+# (prefetch offload, ~0.39 s per step whatever the batch): 83 tok/s with 32 requests at once (probe 2026-11-23).
+# UVA offload (--cpu-offload-gb) re-reads host memory per batch tile: 13-15 tok/s at any batch, GSM8K timed out.
+# Automatic KV sizing fails with prefetch ("0 blocks fit"), so the KV size is given: 2.6 GiB = ~38k tokens.
+  "ref8b-bf16_tp2|0,1|Qwen/Qwen3-8B|--tensor-parallel-size 2 --offload-backend prefetch --offload-group-size 3 --offload-num-in-group 2 --kv-cache-memory-bytes 2791728742 --gpu-memory-utilization 0.85"
   "8b-awq_tp2|0,1|Qwen/Qwen3-8B-AWQ|--tensor-parallel-size 2"
   "8b-awq_tp2_fp8kv|0,1|Qwen/Qwen3-8B-AWQ|--tensor-parallel-size 2 --kv-cache-dtype fp8"
   "8b-fp8_tp2|0,1|Qwen/Qwen3-8B-FP8|--tensor-parallel-size 2"
