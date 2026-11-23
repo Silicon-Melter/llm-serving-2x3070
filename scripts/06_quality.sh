@@ -33,11 +33,16 @@ CONFIGS=(   # name|GPUs|model|extra   (quality does not depend on the GPU layout
 # Automatic KV sizing fails with prefetch ("0 blocks fit"), so the KV size is given: 2.0 GiB = ~29k tokens, with
 # prefill steps of 1,024 tokens. (GSM8K ran with 2.6 GiB; MMLU's long prefills then ran GPU0 out of memory.)
   "ref8b-bf16_tp2|0,1|Qwen/Qwen3-8B|--tensor-parallel-size 2 --offload-backend prefetch --offload-group-size 3 --offload-num-in-group 2 --kv-cache-memory-bytes 2147483648 --gpu-memory-utilization 0.85 --max-num-batched-tokens 1024"
+# 8-bit 8B checkpoints: automatic KV sizing leaves < 1 request on GPU0 (686 MiB held by the display and another
+# service), so 1.6 GiB of KV is given, as in M3.
+# *_fp8kv: FP8 KV needs FlashInfer kernels, which this env does not load by default. Run those configs with
+#   PYTHONPATH=$BULK/envs/flashinfer-jit-cache (pip install --target, flashinfer-jit-cache==0.7.3+cu130),
+# so that the other configs keep the attention backend used in M3.
   "8b-awq_tp2|0,1|Qwen/Qwen3-8B-AWQ|--tensor-parallel-size 2"
   "8b-awq_tp2_fp8kv|0,1|Qwen/Qwen3-8B-AWQ|--tensor-parallel-size 2 --kv-cache-dtype fp8"
-  "8b-fp8_tp2|0,1|Qwen/Qwen3-8B-FP8|--tensor-parallel-size 2"
-  "8b-fp8_tp2_fp8kv|0,1|Qwen/Qwen3-8B-FP8|--tensor-parallel-size 2 --kv-cache-dtype fp8"
-  "8b-w8a8_tp2|0,1|nm-testing/Qwen3-8B-W8A8-INT8|--tensor-parallel-size 2"
+  "8b-fp8_tp2|0,1|Qwen/Qwen3-8B-FP8|--tensor-parallel-size 2 --kv-cache-memory-bytes 1717986918 --gpu-memory-utilization 0.85"
+  "8b-fp8_tp2_fp8kv|0,1|Qwen/Qwen3-8B-FP8|--tensor-parallel-size 2 --kv-cache-dtype fp8 --kv-cache-memory-bytes 1717986918 --gpu-memory-utilization 0.85"
+  "8b-w8a8_tp2|0,1|nm-testing/Qwen3-8B-W8A8-INT8|--tensor-parallel-size 2 --kv-cache-memory-bytes 1717986918 --gpu-memory-utilization 0.85"
   "ref4b-bf16_tp2|0,1|Qwen/Qwen3-4B|--tensor-parallel-size 2"
   "4b-awq_1gpu|1|Qwen/Qwen3-4B-AWQ|"
   "4b-awq_1gpu_fp8kv|1|Qwen/Qwen3-4B-AWQ|--kv-cache-dtype fp8"
@@ -54,7 +59,7 @@ stop_server() { kill -INT -- -"$1" 2>/dev/null; for _ in $(seq 1 30); do kill -0
 
 [ -f "$CORPUS" ] || "$VENV/bin/python" scripts/07_kld.py corpus --model Qwen/Qwen3-8B-AWQ --out "$CORPUS" || exit 1
 { echo "run_id $RUN_ID"; echo "stages $STAGES"; echo "mmlu_limit $MMLU_LIMIT gsm8k_limit ${GSM8K_LIMIT:-all}"
-  echo "concurrency $CONCURRENCY"; echo "common $COMMON"; echo "cpuset $CPUSET"
+  echo "concurrency $CONCURRENCY"; echo "common $COMMON"; echo "cpuset $CPUSET pythonpath ${PYTHONPATH:-}"
   echo "started $(date -Is) commit $(git rev-parse --short HEAD 2>/dev/null)"; cat results/versions.txt 2>/dev/null; } >> "$OUT/run.txt"
 for c in "${CONFIGS[@]}"; do
   IFS='|' read -r NAME GPUS MODEL EXTRA <<<"$c"
