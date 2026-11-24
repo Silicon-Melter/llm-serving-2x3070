@@ -34,16 +34,17 @@ CONFIGS=(   # name|GPUs|model|extra   (quality does not depend on the GPU layout
 # prefill steps of 1,024 tokens. (GSM8K ran with 2.6 GiB; MMLU's long prefills then ran GPU0 out of memory.)
   "ref8b-bf16_tp2|0,1|Qwen/Qwen3-8B|--tensor-parallel-size 2 --offload-backend prefetch --offload-group-size 3 --offload-num-in-group 2 --kv-cache-memory-bytes 2147483648 --gpu-memory-utilization 0.85 --max-num-batched-tokens 1024"
 # 8-bit 8B checkpoints: automatic KV sizing leaves < 1 request on GPU0 (686 MiB held by the display and another
-# service), so the KV size is given: 1.1 GiB with 1,024-token prefill steps (1.6 GiB ran GPU0 out of memory on the
-# first batch of 32 prompts).
+# service), so the KV size is given (1.1 GiB), with 256-token prefill steps: Stage A asks for logprobs at every
+# prompt position, and the logits of one step (tokens x 151,936 x 2 B, copied a few times) ran GPU0 out of memory
+# at 1,024 tokens per step.
 # *_fp8kv: FP8 KV needs FlashInfer kernels, which this env does not load by default. Run those configs with
 #   PYTHONPATH=$BULK/envs/flashinfer-jit-cache (pip install --target, flashinfer-jit-cache==0.7.3+cu130),
 # so that the other configs keep the attention backend used in M3.
   "8b-awq_tp2|0,1|Qwen/Qwen3-8B-AWQ|--tensor-parallel-size 2"
   "8b-awq_tp2_fp8kv|0,1|Qwen/Qwen3-8B-AWQ|--tensor-parallel-size 2 --kv-cache-dtype fp8"
-  "8b-fp8_tp2|0,1|Qwen/Qwen3-8B-FP8|--tensor-parallel-size 2 --kv-cache-memory-bytes 1181116006 --gpu-memory-utilization 0.85 --max-num-batched-tokens 1024"
-  "8b-fp8_tp2_fp8kv|0,1|Qwen/Qwen3-8B-FP8|--tensor-parallel-size 2 --kv-cache-dtype fp8 --kv-cache-memory-bytes 1181116006 --gpu-memory-utilization 0.85 --max-num-batched-tokens 1024"
-  "8b-w8a8_tp2|0,1|nm-testing/Qwen3-8B-W8A8-INT8|--tensor-parallel-size 2 --kv-cache-memory-bytes 1181116006 --gpu-memory-utilization 0.85 --max-num-batched-tokens 1024"
+  "8b-fp8_tp2|0,1|Qwen/Qwen3-8B-FP8|--tensor-parallel-size 2 --kv-cache-memory-bytes 1181116006 --gpu-memory-utilization 0.85 --max-num-batched-tokens 256"
+  "8b-fp8_tp2_fp8kv|0,1|Qwen/Qwen3-8B-FP8|--tensor-parallel-size 2 --kv-cache-dtype fp8 --kv-cache-memory-bytes 1181116006 --gpu-memory-utilization 0.85 --max-num-batched-tokens 256"
+  "8b-w8a8_tp2|0,1|nm-testing/Qwen3-8B-W8A8-INT8|--tensor-parallel-size 2 --kv-cache-memory-bytes 1181116006 --gpu-memory-utilization 0.85 --max-num-batched-tokens 256"
   "ref4b-bf16_tp2|0,1|Qwen/Qwen3-4B|--tensor-parallel-size 2"
   "4b-awq_1gpu|1|Qwen/Qwen3-4B-AWQ|"
   "4b-awq_1gpu_fp8kv|1|Qwen/Qwen3-4B-AWQ|--kv-cache-dtype fp8"
