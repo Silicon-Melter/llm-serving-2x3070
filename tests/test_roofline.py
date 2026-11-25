@@ -41,3 +41,16 @@ def test_pipeline_with_one_user_is_no_faster_than_one_gpu():
 def test_model_that_does_not_fit_has_no_ceiling():
     c, b = roof.ceiling("8b", "bf16", "1gpu", 1)
     assert b == 0 and c != c                                        # NaN
+
+
+def test_card_is_a_parameter_and_defaults_to_the_3070():
+    assert roof.ceiling("8b", "awq", "tp2", 16, hw=roof.HW) == roof.ceiling("8b", "awq", "tp2", 16)
+    fast = dict(roof.HW, bw=2 * roof.HW["bw"])
+    assert roof.decode_ceiling_single("8b", "awq", "1gpu", fast) == pytest.approx(
+        2 * roof.decode_ceiling_single("8b", "awq", "1gpu"))
+
+
+def test_more_vram_lifts_the_kv_cap():
+    big = dict(roof.HW, vram=16 * 2 ** 30)
+    assert roof.ceiling("8b", "awq", "1gpu", 64)[1] == 21
+    assert roof.ceiling("8b", "awq", "1gpu", 64, hw=big)[1] == 64
