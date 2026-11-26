@@ -7,12 +7,32 @@
   "steps": 116,
   "allreduce_share": 0.14370050685860702,
   "allreduce_ms": 182.2515205078125,
-  "gemm_share": 0.8022915214841904,
-  "gemm_ms": 1017.5249404296875,
-  "attention_share": 0.006886429593798183,
-  "attention_ms": 8.733875,
-  "other_share": 0.022892859614234488,
-  "other_ms": 29.0344033203125
+  "attention_share": 0.059947465284276816,
+  "attention_ms": 76.029771484375,
+  "gemm_share": 0.7248102658667349,
+  "gemm_ms": 919.2575302734375,
+  "other_share": 0.047970944465618975,
+  "other_ms": 60.84026953125,
+  "by_step": {
+   "decode": {
+    "steps": 113,
+    "window_ms": 966.5740771484375,
+    "mean_step_ms": 8.553752895118915,
+    "allreduce_share": 0.09956037192025428,
+    "attention_share": 0.07279350653994905,
+    "gemm_share": 0.7609574632731904,
+    "other_share": 0.05133707403712748
+   },
+   "prefill": {
+    "steps": 2,
+    "window_ms": 292.0025078125,
+    "mean_step_ms": 146.00125390625,
+    "allreduce_share": 0.29164264187478484,
+    "attention_share": 0.017284589754031705,
+    "gemm_share": 0.606964078941852,
+    "other_share": 0.03691509993720356
+   }
+  }
  },
  "rank1.1795447090703826005.pt.trace.json.gz": {
   "window_ms": 1268.272912109375,
@@ -22,11 +42,31 @@
   "steps": 116,
   "allreduce_share": 0.14301829423601406,
   "allreduce_ms": 181.386228515625,
-  "gemm_share": 0.8029588245830082,
-  "gemm_ms": 1018.3709267578125,
-  "attention_share": 0.006883362672593398,
-  "attention_ms": 8.729982421875,
-  "other_share": 0.023013432832858144,
-  "other_ms": 29.1873134765625
+  "attention_share": 0.06027137766186898,
+  "attention_ms": 76.4405556640625,
+  "gemm_share": 0.7246837073037244,
+  "gemm_ms": 919.0967158203125,
+  "other_share": 0.048479488202129994,
+  "other_ms": 61.4852216796875,
+  "by_step": {
+   "decode": {
+    "steps": 113,
+    "window_ms": 966.573748046875,
+    "mean_step_ms": 8.553749982715708,
+    "allreduce_share": 0.0989792898849611,
+    "attention_share": 0.07321846070741349,
+    "gemm_share": 0.7602731866042644,
+    "other_share": 0.05215839722718713
+   },
+   "prefill": {
+    "steps": 2,
+    "window_ms": 292.003630859375,
+    "mean_step_ms": 146.0018154296875,
+    "allreduce_share": 0.29066350837795596,
+    "attention_share": 0.01726922956243474,
+    "gemm_share": 0.608666333270591,
+    "other_share": 0.036383584137662454
+   }
+  }
  }
 }

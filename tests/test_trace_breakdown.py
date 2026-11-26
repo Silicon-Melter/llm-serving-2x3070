@@ -18,6 +18,14 @@ spec.loader.exec_module(tb)
     ("ampere_fp16_s16816gemm_fp16_128x128_ldg8_f2f_stages_32x5_tn", "gemm"),
     ("void flash::flash_fwd_splitkv_kernel<...>", "attention"),
     ("triton_red_fused_add_rms_norm_0", "other"),
+    # real names from the h3b-18e63e5 traces: FlashAttention carries cutlass:: template arguments, and Inductor names
+    # its fused RMSNorm / SiLU kernels after the GEMM they feed
+    ("void flash::flash_fwd_splitkv_kernel<Flash_fwd_kernel_traits<128, 64, 64, 4, false, false, cutlass::half_t, "
+     "Flash_kernel_traits<128, 64, 64, 4, cutlass::half_t> >, false, true, false, false, true, false, false, false>"
+     "(Flash_fwd_params)", "attention"),
+    ("triton_red_fused_fused_add_rms_norm_marlin_gemm_2", "other"),
+    ("triton_poi_fused_marlin_gemm_mul_silu_slice_1", "other"),
+    ("triton_tem_fused_mm_0", "gemm"),                           # an Inductor GEMM template is a GEMM
 ])
 def test_classify(name, cls):
     assert tb.classify(name) == cls
@@ -54,3 +62,19 @@ def test_decode_only_leaves_out_prefill_windows():
     b = tb.breakdown(ev, exclude=w)
     assert b["steps"] == 50 and b["gemm_ms"] == pytest.approx(40.0) and b["allreduce_ms"] == pytest.approx(50 * (0.011 + 0.005))  # all-gather is NCCL traffic too
     assert b["window_ms"] == pytest.approx((249_816 - 200_000) / 1e3, rel=1e-3)
+
+
+def test_steps_split_into_decode_and_prefill_by_all_reduce_size():
+    k = lambda name, ts, dur: {"ph": "X", "cat": "kernel", "name": name, "ts": ts, "dur": dur}  # noqa: E731
+    ev, t = [k("ncclDevKernel_AllGather", 0, 10)], 10
+    for i in range(4):                       # 3 decode steps (100 us all-reduces), then 1 prefill step (2 ms)
+        ar = 2_000 if i == 3 else 100
+        ev += [k("marlin_gemm", t, 600), k("ncclDevKernel_AllReduce", t + 600, ar),
+               k("flash_fwd_splitkv_kernel", t + 600 + ar, 200), k("ncclDevKernel_AllGather", t + 800 + ar, 100)]
+        t += 900 + ar
+    r = tb.step_breakdown(ev)
+    assert r["decode"]["steps"] == 3 and r["prefill"]["steps"] == 1
+    assert r["decode"]["mean_step_ms"] == pytest.approx(1.0)                       # 600 + 100 + 200 + 100 us
+    assert r["decode"]["allreduce_share"] == pytest.approx(0.2)                    # all-reduce + all-gather
+    assert r["decode"]["gemm_share"] == pytest.approx(0.6) and r["decode"]["attention_share"] == pytest.approx(0.2)
+    assert r["prefill"]["allreduce_share"] == pytest.approx(2_100 / 2_900)
