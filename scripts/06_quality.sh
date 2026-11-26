@@ -28,6 +28,12 @@ stage_done() { local d="$1"
   esac; }
 [ "${1:-}" = "--stage-done" ] && { stage_done "$2" "$3"; exit $?; }   # used by tests/test_scripts.py
 BULK="${BULK:-/media/earth/SSD2/llm-serving}"; VENV="$BULK/envs/serve-vllm"
+kv_env() {  # kv_env <extra args>: FlashInfer JIT environment for FP8 KV configs (see 03_sweep_vllm.sh)
+  case " $1 " in *" --kv-cache-dtype fp8"*)
+    local c="$VENV/lib/python3.12/site-packages/nvidia/cu13"
+    echo "CUDA_HOME=$c PATH=$VENV/bin:$c/bin:$PATH FLASHINFER_WORKSPACE_BASE=$BULK/flashinfer-ws FLASHINFER_CUDA_ARCH_LIST=8.6" ;;
+  esac; }
+[ "${1:-}" = "--kv-env" ] && { kv_env "$2"; exit 0; }   # used by tests/test_scripts.py
 export HF_HUB_CACHE="${HF_HUB_CACHE:-$BULK/hf}"
 PORT=8000; HOST=127.0.0.1; CPUSET="${CPUSET:-0-19}"; SEED=1234
 STAGES="${STAGES:-kld gsm8k mmlu}"; MMLU_LIMIT="${MMLU_LIMIT:-20}"; GSM8K_LIMIT="${GSM8K_LIMIT:-}"
@@ -46,14 +52,14 @@ CONFIGS=(   # name|GPUs|model|extra   (quality does not depend on the GPU layout
 # service), so the KV size is given (1.1 GiB), with 256-token prefill steps: Stage A asks for logprobs at every
 # prompt position, and the logits of one step (tokens x 151,936 x 2 B, copied a few times) ran GPU0 out of memory
 # at 1,024 tokens per step.
-# *_fp8kv: FP8 KV needs FlashInfer kernels, which this env does not load by default. Run those configs with
-#   PYTHONPATH=$BULK/envs/flashinfer-jit-cache (pip install --target, flashinfer-jit-cache==0.7.3+cu130),
-# so that the other configs keep the attention backend used in M3.
+# *_fp8kv: FP8 KV on sm_86 goes through FlashInfer, whose kernels compile on first use; kv_env (same as in
+# 03_sweep_vllm.sh) gives those configs CUDA_HOME and ninja. The other configs keep the plain environment.
   "8b-awq_tp2|0,1|Qwen/Qwen3-8B-AWQ|--tensor-parallel-size 2"
   "8b-awq_tp2_fp8kv|0,1|Qwen/Qwen3-8B-AWQ|--tensor-parallel-size 2 --kv-cache-dtype fp8"
   "8b-fp8_tp2|0,1|Qwen/Qwen3-8B-FP8|--tensor-parallel-size 2 --kv-cache-memory-bytes 1181116006 --gpu-memory-utilization 0.85 --max-num-batched-tokens 256"
   "8b-fp8_tp2_fp8kv|0,1|Qwen/Qwen3-8B-FP8|--tensor-parallel-size 2 --kv-cache-dtype fp8 --kv-cache-memory-bytes 1181116006 --gpu-memory-utilization 0.85 --max-num-batched-tokens 256"
   "8b-w8a8_tp2|0,1|nm-testing/Qwen3-8B-W8A8-INT8|--tensor-parallel-size 2 --kv-cache-memory-bytes 1181116006 --gpu-memory-utilization 0.85 --max-num-batched-tokens 256"
+  "8b-w8a8_tp2_fp8kv|0,1|nm-testing/Qwen3-8B-W8A8-INT8|--tensor-parallel-size 2 --kv-cache-dtype fp8 --kv-cache-memory-bytes 1181116006 --gpu-memory-utilization 0.85 --max-num-batched-tokens 256"
   "ref4b-bf16_tp2|0,1|Qwen/Qwen3-4B|--tensor-parallel-size 2"
   "4b-awq_1gpu|1|Qwen/Qwen3-4B-AWQ|"
   "4b-awq_1gpu_fp8kv|1|Qwen/Qwen3-4B-AWQ|--kv-cache-dtype fp8"
@@ -80,9 +86,9 @@ for c in "${CONFIGS[@]}"; do
   [ -z "$TODO" ] && { echo "=== $NAME: all stages already done, skipped"; continue; }
   echo "=== $NAME ($MODEL, GPUs $GPUS), stages:$TODO"
   wait_idle || { echo "  GPUs busy before start, stopping"; exit 1; }
-  CUDA_VISIBLE_DEVICES=$GPUS setsid taskset -c "$CPUSET" "$VENV/bin/vllm" serve "$MODEL" $COMMON $EXTRA > "$D/server.log" 2>&1 &
+  CUDA_VISIBLE_DEVICES=$GPUS setsid taskset -c "$CPUSET" env $(kv_env "$EXTRA") "$VENV/bin/vllm" serve "$MODEL" $COMMON $EXTRA > "$D/server.log" 2>&1 &
   SPID=$!; up=""
-  for _ in $(seq 1 240); do curl -sf "http://$HOST:$PORT/health" >/dev/null && { up=1; break; }
+  for _ in $(seq 1 480); do curl -sf "http://$HOST:$PORT/health" >/dev/null && { up=1; break; }
     kill -0 "$SPID" 2>/dev/null || break; sleep 5; done
   if [ -z "$up" ]; then echo "  did not start: $(grep -m1 -E 'out of memory|Error' "$D/server.log" | sed 's/^.*\] //' | cut -c1-160)"
     stop_server "$SPID"; continue; fi
