@@ -47,6 +47,8 @@ CONFIGS=(
   "4b-awq_1gpu|1|Qwen/Qwen3-4B-AWQ|"
   "4b-awq_dp2|0,1|Qwen/Qwen3-4B-AWQ|--data-parallel-size 2"
   "4b-awq_tp2|0,1|Qwen/Qwen3-4B-AWQ|--tensor-parallel-size 2"
+  "4b-fp8_1gpu|1|Qwen/Qwen3-4B-FP8|"                              # M5: passes the quality gate; speed not yet measured
+  "4b-fp8_dp2|0,1|Qwen/Qwen3-4B-FP8|--data-parallel-size 2"
   # 8B as 2 copies: with torch.compile (Inductor) the GPU0 copy runs out of memory while autotuning a 2,048-token
   # logits buffer (1.16 GiB), so these run with the Inductor backend off; the _eager 1-GPU and TP=2 runs measure what
   # that costs, so H1 compares like with like.
