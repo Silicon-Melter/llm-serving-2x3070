@@ -53,3 +53,11 @@ def test_compare_refuses_different_corpora():
     row = {"real_lp": -1.0, "top": [(1, -1.0)]}
     with pytest.raises(SystemExit):
         kld.compare([[row, row]], [[row]])
+
+
+def test_token_missing_from_the_test_top_k_gets_the_test_floor():
+    # token 2 is in the reference's top-K but not the test's: it gets the test's lowest listed probability (0.35)
+    ref = lp([(1, 0.5), (2, 0.3)])
+    test = lp([(1, 0.6), (3, 0.35)])
+    expected = 0.5 * math.log(0.5 / 0.6) + 0.3 * math.log(0.3 / 0.35) + 0.2 * math.log(0.2 / (1 - 0.6 - 0.35))
+    assert kld.kl_topk(ref, test) == pytest.approx(expected, rel=1e-6)
