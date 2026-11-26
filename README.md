@@ -41,7 +41,7 @@ will show.
 3. `bash scripts/02_nccl.sh` → `results/nccl_allreduce.txt`.
 4. `bash scripts/03_sweep_vllm.sh` (each config: start server, wait, sweep concurrency, stop) → `results/vllm/*.json`.
 5. `bash scripts/04_sweep_sglang.sh` → `results/sglang/*.json`.
-6. `python scripts/05_analyse.py results/` → `results/summary.csv` and the charts.
+6. `python scripts/05_analyse.py results/ --runs m3-581eb68 m3b-ab5bb8b` → `results/summary.csv` and the charts. Name the runs: other folders under `results/vllm/` are pre-checks and probes with different KV sizes (e.g. `m3-tpcheck*` used automatic sizing, 24,576 KV tokens instead of 46,464).
 7. Tuning round on the best config: CUDA graphs on/off, `--max-num-seqs`, chunked prefill, `--kv-cache-dtype fp8`,
    PP with more in-flight requests. Change one thing at a time and log why.
 8. Write-up: README with the table, 3–4 charts, the nsys screenshot of the all-reduce, and "what I'd do on NVLink /
