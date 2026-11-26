@@ -5,6 +5,7 @@
 #   REPEAT=2 bash scripts/03_sweep_vllm.sh                         # full matrix, 2 repeats
 # Output: results/vllm/<run-id>/<name>_c<C>_r<k>.json, <name>.server.txt (KV size, kernels), <name>.log
 set -uo pipefail
+BULK="${BULK:-/media/earth/SSD2/llm-serving}"; VENV="$BULK/envs/serve-vllm"
 bench_ok() {  # bench_ok <bench log>: at least one request succeeded and none failed
   grep -qE "^Successful requests:\s+[1-9]" "$1" || return 1
   if grep -q "^Failed requests:" "$1"; then grep -qE "^Failed requests:\s+0\s*$" "$1"; fi
@@ -16,9 +17,17 @@ kv_auto() {  # kv_auto <server log>: KV size automatic sizing gave, smallest ove
   grep -oE "KV cache blocks \([0-9.]+ GiB\) fit" "$1" | grep -oE "[0-9.]+" | sort -g | head -1 |
     python3 -c "import sys; v=sys.stdin.read().strip(); print(int(float(v)*2**30) if v else 0)"
 }
+# kv_env <extra args>: environment for FP8 KV configs only. On sm_86 vLLM serves FP8 KV through FlashInfer, whose
+# kernels are compiled on first use: it needs CUDA_HOME (the CUDA 13 toolkit that ships as pip wheels inside the venv;
+# /usr/local/cuda is 12.3, too old for torch cu130) and ninja on PATH. Other configs run with the plain environment.
+kv_env() {
+  case " $1 " in *" --kv-cache-dtype fp8"*)
+    local c="$VENV/lib/python3.12/site-packages/nvidia/cu13"
+    echo "CUDA_HOME=$c PATH=$VENV/bin:$c/bin:$PATH FLASHINFER_WORKSPACE_BASE=$BULK/flashinfer-ws FLASHINFER_CUDA_ARCH_LIST=8.6" ;;
+  esac; }
 [ "${1:-}" = "--check-bench-log" ] && { bench_ok "$2"; exit $?; }   # used by tests/test_scripts.py
 [ "${1:-}" = "--parse-kv-log" ] && { echo "$(kv_suggest "$2") $(kv_auto "$2")"; exit 0; }
-BULK="${BULK:-/media/earth/SSD2/llm-serving}"; VENV="$BULK/envs/serve-vllm"
+[ "${1:-}" = "--kv-env" ] && { kv_env "$2"; exit 0; }
 export HF_HUB_CACHE="${HF_HUB_CACHE:-$BULK/hf}"
 PORT=8000; HOST=127.0.0.1                     # 127.0.0.1, not localhost (name lookup adds latency)
 CONC="${CONC:-1 4 16 64}"; IN=512; OUTLEN=256; REPEAT="${REPEAT:-1}"; SEED=1234
@@ -49,6 +58,7 @@ CONFIGS=(
   "4b-awq_tp2|0,1|Qwen/Qwen3-4B-AWQ|--tensor-parallel-size 2"
   "4b-fp8_1gpu|1|Qwen/Qwen3-4B-FP8|"                              # M5: passes the quality gate; speed not yet measured
   "4b-fp8_dp2|0,1|Qwen/Qwen3-4B-FP8|--data-parallel-size 2"
+  "8b-w8a8_tp2_fp8kv|0,1|nm-testing/Qwen3-8B-W8A8-INT8|--tensor-parallel-size 2 --kv-cache-dtype fp8"   # M5 step 2
   # 8B as 2 copies: with torch.compile (Inductor) the GPU0 copy runs out of memory while autotuning a 2,048-token
   # logits buffer (1.16 GiB), so these run with the Inductor backend off; the _eager 1-GPU and TP=2 runs measure what
   # that costs, so H1 compares like with like.
@@ -83,9 +93,10 @@ SMOKE_C=64   # a KV size is accepted only if the server also survives a burst at
 try_start() {  # try_start <label> <kv args>: start the server; 0 = up and survived the smoke test (left running)
   local A="$1" KVA="$2" i up=""
   LOG="$OUT/$NAME.try-$A.log"
-  CUDA_VISIBLE_DEVICES=$GPUS setsid taskset -c "$CPUSET" "$VENV/bin/vllm" serve "$MODEL" $COMMON $KVA $EXTRA > "$LOG" 2>&1 &
+  CUDA_VISIBLE_DEVICES=$GPUS setsid taskset -c "$CPUSET" env $(kv_env "$EXTRA") "$VENV/bin/vllm" serve "$MODEL" $COMMON $KVA $EXTRA > "$LOG" 2>&1 &
   SPID=$!
-  for i in $(seq 1 180); do
+  local tries=180; [ -n "$(kv_env "$EXTRA")" ] && tries=480   # first FP8-KV start compiles FlashInfer kernels
+  for i in $(seq 1 $tries); do
     curl -sf "http://$HOST:$PORT/health" >/dev/null && { up=1; break; }
     kill -0 "$SPID" 2>/dev/null || break; sleep 5
   done

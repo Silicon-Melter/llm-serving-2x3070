@@ -123,3 +123,14 @@ def test_quality_stage_done_reads_gzipped_samples(tmp_path):
     for i in range(29, 57):
         (lm / f"samples_mmlu_s{i}_x.jsonl.gz").write_bytes(gzip.compress(b'{"doc_id": 0}\n'))
     assert _stage_done(d, "mmlu")
+
+
+def test_sweep_sets_the_flashinfer_build_environment_only_for_fp8_kv():
+    """FP8 KV on sm_86 goes through FlashInfer's JIT: CUDA_HOME must be the venv's CUDA 13 wheels, ninja on PATH."""
+    run = lambda extra: subprocess.run(["bash", str(ROOT / "scripts/03_sweep_vllm.sh"), "--kv-env", extra],  # noqa: E731
+                                       capture_output=True, text=True, env={**os.environ, "BULK": "/b"}).stdout.split()
+    env = dict(kv.split("=", 1) for kv in run("--tensor-parallel-size 2 --kv-cache-dtype fp8"))
+    assert env["CUDA_HOME"] == "/b/envs/serve-vllm/lib/python3.12/site-packages/nvidia/cu13"
+    assert env["PATH"].split(":")[:2] == ["/b/envs/serve-vllm/bin", env["CUDA_HOME"] + "/bin"]
+    assert env["FLASHINFER_CUDA_ARCH_LIST"] == "8.6"
+    assert run("--tensor-parallel-size 2") == [] and run("") == []
