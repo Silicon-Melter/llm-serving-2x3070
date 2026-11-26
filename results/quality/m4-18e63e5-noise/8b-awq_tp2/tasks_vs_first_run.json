@@ -1,0 +1,35 @@
+{
+ "gsm8k": {
+  "n": 1319,
+  "acc_ref": 86.27748294162244,
+  "acc_test": 86.3532979529947,
+  "diff_points": 0.0758150113722517,
+  "diff_ci95": [
+   -0.1516300227445034,
+   0.3032600454890068
+  ],
+  "right_to_wrong": 1,
+  "wrong_to_right": 2,
+  "flip_rate": 0.22744503411675512,
+  "mcnemar_p": 1.0,
+  "passes": true
+ },
+ "mmlu": {
+  "n": 1140,
+  "acc_ref": 76.84210526315789,
+  "acc_test": 76.75438596491227,
+  "diff_points": -0.08771929824561403,
+  "diff_ci95": [
+   -0.2631578947368421,
+   0.0
+  ],
+  "right_to_wrong": 1,
+  "wrong_to_right": 0,
+  "flip_rate": 0.08771929824561403,
+  "mcnemar_p": 1.0,
+  "passes": true
+ },
+ "passes": true,
+ "ref": "results/quality/m4-18e63e5/8b-awq_tp2",
+ "test": "results/quality/m4-18e63e5-noise/8b-awq_tp2"
+}

@@ -1,0 +1,35 @@
+{
+ "gsm8k": {
+  "n": 1319,
+  "acc_ref": 85.44351781652767,
+  "acc_test": 83.69977255496589,
+  "diff_points": -1.7437452615617892,
+  "diff_ci95": [
+   -3.56330553449583,
+   0.22744503411675512
+  ],
+  "right_to_wrong": 90,
+  "wrong_to_right": 67,
+  "flip_rate": 11.902956785443518,
+  "mcnemar_p": 0.07879180968274002,
+  "passes": false
+ },
+ "mmlu": {
+  "n": 1140,
+  "acc_ref": 72.28070175438596,
+  "acc_test": 69.64912280701755,
+  "diff_points": -2.6315789473684212,
+  "diff_ci95": [
+   -4.385964912280702,
+   -0.8771929824561403
+  ],
+  "right_to_wrong": 71,
+  "wrong_to_right": 41,
+  "flip_rate": 9.824561403508772,
+  "mcnemar_p": 0.005890172980413253,
+  "passes": false
+ },
+ "passes": false,
+ "ref": "results/quality/m4-18e63e5/ref4b-bf16_tp2",
+ "test": "results/quality/m4-18e63e5/4b-awq_1gpu"
+}

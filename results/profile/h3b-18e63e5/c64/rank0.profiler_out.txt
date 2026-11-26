@@ -1,0 +1,107 @@
+-------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  
+                                                   Name    Self CPU %      Self CPU   CPU total %     CPU total  CPU time avg     Self CUDA   Self CUDA %    CUDA total  CUDA time avg    # of Calls  
+-------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  
+void marlin::Marlin<1125899906910725l, 1125899906843...         0.00%       0.000us         0.00%       0.000us       0.000us        6.798s        55.43%        6.798s     417.761us         16272  
+                                        _C::marlin_gemm         0.37%      45.736ms         1.43%     178.243ms      68.767us        5.646s        46.03%        5.646s       2.178ms          2592  
+              execute_context_5(1997)_generation_51(51)         0.00%       0.000us         0.00%       0.000us       0.000us        5.023s        40.96%        5.023s     558.144ms             9  
+                 execute_context_0(0)_generation_64(64)         0.00%       0.000us         0.00%       0.000us       0.000us        4.405s        35.92%        4.405s      27.530ms           160  
+ncclDevKernel_AllReduce_Sum_f16_RING_LL(ncclDevKerne...         0.00%       0.000us         0.00%       0.000us       0.000us        3.377s        27.53%        3.377s     388.690us          8687  
+                                       vllm::all_reduce         0.33%      40.706ms         0.77%      95.452ms      72.642us        2.695s        21.98%        2.695s       2.051ms          1314  
+              execute_context_5(1998)_generation_50(50)         0.00%       0.000us         0.00%       0.000us       0.000us        1.115s         9.09%        1.115s     557.550ms             2  
+void flash::flash_fwd_splitkv_kernel<Flash_fwd_kerne...         0.00%       0.000us         0.00%       0.000us       0.000us     626.685ms         5.11%     626.685ms     179.463us          3492  
+              execute_context_5(1990)_generation_58(58)         0.00%       0.000us         0.00%       0.000us       0.000us     560.740ms         4.57%     560.740ms     560.740ms             1  
+              execute_context_4(1996)_generation_52(52)         0.00%       0.000us         0.00%       0.000us       0.000us     558.901ms         4.56%     558.901ms     558.901ms             1  
+              execute_context_5(1994)_generation_54(54)         0.00%       0.000us         0.00%       0.000us       0.000us     558.673ms         4.56%     558.673ms     558.673ms             1  
+              execute_context_4(1997)_generation_51(51)         0.00%       0.000us         0.00%       0.000us       0.000us     558.047ms         4.55%     558.047ms     558.047ms             1  
+                                _vllm_fa2_C::varlen_fwd         0.08%       9.356ms         0.32%      39.882ms      61.546us     517.328ms         4.22%     517.328ms     798.346us           648  
+void flash::flash_fwd_splitkv_kernel<Flash_fwd_kerne...         0.00%       0.000us         0.00%       0.000us       0.000us     517.328ms         4.22%     517.328ms     798.346us           648  
+              execute_context_3(1536)_generation_53(53)         0.00%       0.000us         0.00%       0.000us       0.000us     444.541ms         3.62%     444.541ms     444.541ms             1  
+               execute_context_2(774)_generation_62(62)         0.00%       0.000us         0.00%       0.000us       0.000us     252.345ms         2.06%     252.345ms     252.345ms             1  
+                 execute_context_0(0)_generation_63(63)         0.00%       0.000us         0.00%       0.000us       0.000us     221.586ms         1.81%     221.586ms      27.698ms             8  
+                                               aten::mm         0.02%       2.829ms         0.05%       6.199ms      52.091us     187.459ms         1.53%     187.459ms       1.575ms           119  
+               execute_context_1(512)_generation_60(60)         0.00%       0.000us         0.00%       0.000us       0.000us     181.820ms         1.48%     181.820ms     181.820ms             1  
+ampere_fp16_s16816gemm_fp16_64x64_sliced1x2_ldg8_f2f...         0.00%       0.000us         0.00%       0.000us       0.000us     181.453ms         1.48%     181.453ms       1.578ms           115  
+                                       vllm::all_gather         0.05%       6.135ms         0.13%      16.736ms     140.638us     162.439ms         1.32%     173.643ms       1.459ms           119  
+ncclDevKernel_AllGather_RING_LL(ncclDevKernelArgsSto...         0.00%       0.000us         0.00%       0.000us       0.000us     162.439ms         1.32%     162.439ms       1.365ms           119  
+      triton_red_fused_fused_add_rms_norm_marlin_gemm_2         0.00%       0.000us         0.00%       0.000us       0.000us     150.377ms         1.23%     150.377ms      36.105us          4165  
+      triton_red_fused_fused_add_rms_norm_marlin_gemm_2         0.06%       7.556ms         0.17%      21.415ms      33.991us     138.073ms         1.13%     138.073ms     219.163us           630  
+          triton_poi_fused_marlin_gemm_mul_silu_slice_1         0.00%       0.000us         0.00%       0.000us       0.000us     122.666ms         1.00%     122.666ms      28.633us          4284  
+          triton_poi_fused_marlin_gemm_mul_silu_slice_1         0.04%       5.443ms         0.16%      19.995ms      30.857us     111.341ms         0.91%     111.341ms     171.823us           648  
+                 execute_context_0(0)_generation_57(57)         0.00%       0.000us         0.00%       0.000us       0.000us     110.705ms         0.90%     110.705ms      27.676ms             4  
+      triton_red_fused_fused_add_rms_norm_marlin_gemm_0         0.00%       0.000us         0.00%       0.000us       0.000us      91.301ms         0.74%      91.301ms      21.312us          4284  
+      triton_red_fused_fused_add_rms_norm_marlin_gemm_0         0.06%       7.508ms         0.11%      14.104ms      21.766us      79.267ms         0.65%      79.267ms     122.325us           648  
+                 execute_context_0(0)_generation_60(60)         0.00%       0.000us         0.00%       0.000us       0.000us      55.218ms         0.45%      55.218ms      27.609ms             2  
+                 execute_context_0(0)_generation_53(53)         0.00%       0.000us         0.00%       0.000us       0.000us      53.854ms         0.44%      53.854ms      26.927ms             2  
+                 execute_context_0(0)_generation_49(49)         0.00%       0.000us         0.00%       0.000us       0.000us      53.612ms         0.44%      53.612ms      26.806ms             2  
+                 execute_context_0(0)_generation_45(45)         0.00%       0.000us         0.00%       0.000us       0.000us      43.825ms         0.36%      43.825ms      21.913ms             2  
+                 execute_context_0(0)_generation_41(41)         0.00%       0.000us         0.00%       0.000us       0.000us      43.585ms         0.36%      43.585ms      21.792ms             2  
+                 execute_context_0(0)_generation_33(33)         0.00%       0.000us         0.00%       0.000us       0.000us      41.677ms         0.34%      41.677ms      20.839ms             2  
+                 execute_context_0(0)_generation_37(37)         0.00%       0.000us         0.00%       0.000us       0.000us      41.223ms         0.34%      41.223ms      20.612ms             2  
+void marlin::Marlin<1125899906910725l, 1125899906843...         0.00%       0.000us         0.00%       0.000us       0.000us      40.237ms         0.33%      40.237ms      69.855us           576  
+triton_per_fused_add_cat_index_select_mul_rms_norm_s...         0.00%       0.000us         0.00%       0.000us       0.000us      35.551ms         0.29%      35.551ms       8.536us          4165  
+                 execute_context_0(0)_generation_29(29)         0.00%       0.000us         0.00%       0.000us       0.000us      32.865ms         0.27%      32.865ms      16.432ms             2  
+                 execute_context_0(0)_generation_25(25)         0.00%       0.000us         0.00%       0.000us       0.000us      31.996ms         0.26%      31.996ms      15.998ms             2  
+void at::native::elementwise_kernel<128, 4, at::nati...         0.00%       0.000us         0.00%       0.000us       0.000us      30.095ms         0.25%      30.095ms       4.072us          7391  
+                 execute_context_0(0)_generation_21(21)         0.00%       0.000us         0.00%       0.000us       0.000us      29.145ms         0.24%      29.145ms      14.572ms             2  
+void marlin::Marlin<1125899906910725l, 1125899906843...         0.00%       0.000us         0.00%       0.000us       0.000us      28.242ms         0.23%      28.242ms      49.030us           576  
+                 execute_context_0(0)_generation_18(18)         0.00%       0.000us         0.00%       0.000us       0.000us      28.201ms         0.23%      28.201ms      14.101ms             2  
+triton_per_fused_add_cat_index_select_mul_rms_norm_s...         0.06%       6.930ms         0.17%      20.602ms      32.702us      26.262ms         0.21%      26.262ms      41.686us           630  
+void vllm::reshape_and_cache_flash_kernel<unsigned s...         0.00%       0.000us         0.00%       0.000us       0.000us      26.045ms         0.21%      26.045ms       6.080us          4284  
+                 execute_context_0(0)_generation_14(14)         0.00%       0.000us         0.00%       0.000us       0.000us      22.011ms         0.18%      22.011ms      11.006ms             2  
+                 execute_context_0(0)_generation_10(10)         0.00%       0.000us         0.00%       0.000us       0.000us      21.537ms         0.18%      21.537ms      10.768ms             2  
+                   execute_context_0(0)_generation_6(6)         0.00%       0.000us         0.00%       0.000us       0.000us      18.147ms         0.15%      18.147ms       9.074ms             2  
+                  _C_cache_ops::reshape_and_cache_flash         0.04%       5.028ms         0.14%      17.665ms      27.261us      18.107ms         0.15%      18.107ms      27.942us           648  
+void marlin::Marlin<1125899906910725l, 1125899906843...         0.00%       0.000us         0.00%       0.000us       0.000us      15.743ms         0.13%      15.743ms      36.442us           432  
+triton_per_fused_add_cat_index_select_mul_rms_norm_s...         0.00%       0.000us         0.00%       0.000us       0.000us      15.182ms         0.12%      15.182ms       3.645us          4165  
+                   execute_context_0(0)_generation_2(2)         0.00%       0.000us         0.00%       0.000us       0.000us      14.521ms         0.12%      14.521ms       7.260ms             2  
+                                            aten::copy_         0.03%       3.445ms         0.06%       7.970ms       9.568us      11.657ms         0.10%      11.657ms      13.994us           833  
+void marlin::Marlin<1125899906910725l, 1125899906843...         0.00%       0.000us         0.00%       0.000us       0.000us      10.632ms         0.09%      10.632ms      36.916us           288  
+triton_per_fused_add_cat_index_select_mul_rms_norm_s...         0.04%       5.152ms         0.17%      20.663ms      32.799us       7.509ms         0.06%       7.509ms      11.919us           630  
+                                  _gumbel_sample_kernel         0.00%       0.000us         0.00%       0.000us       0.000us       6.093ms         0.05%       6.093ms      51.206us           119  
+void at::native::elementwise_kernel<128, 2, at::nati...         0.00%       0.000us         0.00%       0.000us       0.000us       5.187ms         0.04%       5.187ms       1.485us          3492  
+void flash::flash_fwd_splitkv_kernel<Flash_fwd_kerne...         0.00%       0.000us         0.00%       0.000us       0.000us       4.918ms         0.04%       4.918ms      34.154us           144  
+ampere_fp16_s16816gemm_fp16_128x64_ldg8_f2f_stages_6...         0.00%       0.000us         0.00%       0.000us       0.000us       4.510ms         0.04%       4.510ms       1.503ms             3  
+                  triton_red_fused_fused_add_rms_norm_2         0.00%       0.000us         0.00%       0.000us       0.000us       3.337ms         0.03%       3.337ms      28.043us           119  
+                  triton_red_fused_fused_add_rms_norm_2         0.00%     214.780us         0.02%       2.847ms     158.168us       2.989ms         0.02%       2.989ms     166.078us            18  
+                triton_red_fused_marlin_gemm_rms_norm_0         0.00%       0.000us         0.00%       0.000us       0.000us       1.707ms         0.01%       1.707ms      14.342us           119  
+ampere_fp16_s16816gemm_fp16_64x64_ldg8_f2f_stages_64...         0.00%       0.000us         0.00%       0.000us       0.000us       1.496ms         0.01%       1.496ms       1.496ms             1  
+                triton_red_fused_marlin_gemm_rms_norm_0         0.00%     265.640us         0.02%       1.983ms     110.148us       1.472ms         0.01%       1.472ms      81.773us            18  
+void vllm::vocab_embedding::vocab_parallel_embedding...         0.00%       0.000us         0.00%       0.000us       0.000us       1.291ms         0.01%       1.291ms      10.851us           119  
+                                            aten::index         0.04%       4.368ms         0.09%      11.512ms      32.247us       1.103ms         0.01%       1.103ms       3.090us           357  
+triton_per_fused_add_cat_index_select_mul_rms_norm_s...         0.00%       0.000us         0.00%       0.000us       0.000us       1.013ms         0.01%       1.013ms       8.516us           119  
+                           _C::vocab_parallel_embedding         0.00%     175.590us         0.00%     369.899us      20.550us     975.394us         0.01%     975.394us      54.189us            18  
+triton_per_fused_add_cat_index_select_mul_rms_norm_s...         0.00%     230.940us         0.00%     344.429us      19.135us     747.718us         0.01%     747.718us      41.540us            18  
+                            _gather_block_tables_kernel         0.00%       0.000us         0.00%       0.000us       0.000us     524.912us         0.00%     524.912us       4.411us           119  
+void at::native::index_elementwise_kernel<128, 4, at...         0.00%       0.000us         0.00%       0.000us       0.000us     473.204us         0.00%     473.204us       3.977us           119  
+                   _get_num_sampled_and_rejected_kernel         0.00%       0.000us         0.00%       0.000us       0.000us     468.369us         0.00%     468.369us       3.936us           119  
+               _combine_sampled_and_draft_tokens_kernel         0.00%       0.000us         0.00%       0.000us       0.000us     452.627us         0.00%     452.627us       3.804us           119  
+triton_per_fused_add_cat_index_select_mul_rms_norm_s...         0.00%       0.000us         0.00%       0.000us       0.000us     427.792us         0.00%     427.792us       3.595us           119  
+                                            aten::fill_         0.02%       2.165ms         0.05%       5.717ms       9.609us     424.236us         0.00%     424.236us       0.713us           595  
+                                    _post_update_kernel         0.00%       0.000us         0.00%       0.000us       0.000us     398.864us         0.00%     398.864us       3.352us           119  
+void flash::flash_fwd_splitkv_combine_kernel<Flash_f...         0.00%       0.000us         0.00%       0.000us       0.000us     354.934us         0.00%     354.934us       4.930us            72  
+                          _compute_slot_mappings_kernel         0.00%       0.000us         0.00%       0.000us       0.000us     342.326us         0.00%     342.326us       2.877us           119  
+void at::native::index_elementwise_kernel<128, 4, at...         0.00%       0.000us         0.00%       0.000us       0.000us     341.078us         0.00%     341.078us       2.866us           119  
+                                 _gumbel_combine_kernel         0.00%       0.000us         0.00%       0.000us       0.000us     302.421us         0.00%     302.421us       2.541us           119  
+void at::native::vectorized_gather_kernel<16, long>(...         0.00%       0.000us         0.00%       0.000us       0.000us     288.919us         0.00%     288.919us       2.428us           119  
+void at::native::vectorized_elementwise_kernel<4, at...         0.00%       0.000us         0.00%       0.000us       0.000us     276.722us         0.00%     276.722us       1.163us           238  
+                                    _apply_write_kernel         0.00%       0.000us         0.00%       0.000us       0.000us     271.641us         0.00%     271.641us       3.671us            74  
+                         Memcpy DtoH (Device -> Pinned)         0.00%       0.000us         0.00%       0.000us       0.000us     246.457us         0.00%     246.457us       1.036us           238  
+triton_per_fused_add_cat_index_select_mul_rms_norm_s...         0.00%     173.150us         0.00%     275.790us      15.322us     210.812us         0.00%     210.812us      11.712us            18  
+                         Memcpy HtoD (Pinned -> Device)         0.00%       0.000us         0.00%       0.000us       0.000us     205.756us         0.00%     205.756us       0.865us           238  
+void flash::flash_fwd_splitkv_combine_kernel<Flash_f...         0.00%       0.000us         0.00%       0.000us       0.000us     178.010us         0.00%     178.010us       4.945us            36  
+void flash::flash_fwd_splitkv_combine_kernel<Flash_f...         0.00%       0.000us         0.00%       0.000us       0.000us     177.850us         0.00%     177.850us       4.940us            36  
+                                          memcpy32_post         0.00%       0.000us         0.00%       0.000us       0.000us     168.696us         0.00%     168.696us       1.670us           101  
+                           _prepare_pos_seq_lens_kernel         0.00%       0.000us         0.00%       0.000us       0.000us     157.439us         0.00%     157.439us       1.323us           119  
+void at::native::vectorized_elementwise_kernel<4, at...         0.00%       0.000us         0.00%       0.000us       0.000us     128.923us         0.00%     128.923us       1.074us           120  
+                                           aten::arange         0.01%     878.789us         0.03%       4.322ms      18.161us     117.850us         0.00%     235.700us       0.990us           238  
+void (anonymous namespace)::elementwise_kernel_with_...         0.00%       0.000us         0.00%       0.000us       0.000us     117.850us         0.00%     117.850us       0.990us           119  
+                         _prepare_prefill_inputs_kernel         0.00%       0.000us         0.00%       0.000us       0.000us      82.908us         0.00%      82.908us       4.606us            18  
+void at::native::unrolled_elementwise_kernel<at::nat...         0.00%       0.000us         0.00%       0.000us       0.000us      14.303us         0.00%      14.303us       0.954us            15  
+void at::native::vectorized_elementwise_kernel<2, at...         0.00%       0.000us         0.00%       0.000us       0.000us       4.288us         0.00%       4.288us       1.072us             4  
+                 execute_context_0(0)_generation_64(64)         0.26%      32.426ms         0.70%      86.980ms       1.087ms       0.000us         0.00%     384.403us       4.805us            80  
+                                            aten::slice         0.06%       6.920ms         0.08%       9.539ms       1.528us       0.000us         0.00%       0.000us       0.000us          6243  
+                                       aten::as_strided         0.04%       4.956ms         0.04%       4.956ms       0.480us       0.000us         0.00%       0.000us       0.000us         10316  
+-------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  
+Self CPU time total: 12.431s
+Self CUDA time total: 12.264s
+

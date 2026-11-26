@@ -1,0 +1,12 @@
+run_id m4-18e63e5-noise
+stages kld gsm8k mmlu
+mmlu_limit 20 gsm8k_limit all
+concurrency 8
+common --max-model-len 4096 --max-num-seqs 32 --port 8000 --host 127.0.0.1 --seed 1234
+cpuset 0-2,4-18
+started 2026-11-23T21:48:13+07:00 commit 9729fc5
+date 2026-11-22T13:06:27+07:00
+driver 595.99.02
+vllm 0.34.0 torch 2.14.0+cu130 cuda 13.0 nccl (2, 30, 7)
+sglang 0.5.23 torch 2.14.1+cu130 cuda 13.0
+nccl-tests built against /media/earth/SSD2/llm-serving/envs/serve-vllm/lib/python3.12/site-packages/nvidia/nccl
