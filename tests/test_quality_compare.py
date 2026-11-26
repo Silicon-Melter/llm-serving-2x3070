@@ -73,3 +73,16 @@ def test_runs_on_different_questions_are_refused(tmp_path):
     write(tmp_path / "test", "gsm8k", [1] * 8, "exact_match", "strict-match")
     with pytest.raises(SystemExit):
         qc.compare(tmp_path / "ref", tmp_path / "test")
+
+
+def test_gzipped_samples_give_the_same_result(tmp_path):
+    import gzip
+    write(tmp_path / "ref", "gsm8k", [1, 0, 1, 1] * 50, "exact_match", "strict-match")
+    write(tmp_path / "test", "gsm8k", [1, 1, 0, 1] * 50, "exact_match", "strict-match")
+    plain = qc.compare(tmp_path / "ref", tmp_path / "test")
+    for f in (tmp_path / "test").glob("samples_*.jsonl"):
+        f.with_suffix(".jsonl.gz").write_bytes(gzip.compress(f.read_bytes())); f.unlink()
+    assert qc.compare(tmp_path / "ref", tmp_path / "test") == plain
+    for f in (tmp_path / "test").glob("samples_*.jsonl.gz"):                 # plain + gz twin: counted once
+        f.with_suffix("").write_bytes(gzip.decompress(f.read_bytes()))
+    assert qc.compare(tmp_path / "ref", tmp_path / "test")["gsm8k"]["n"] == 200

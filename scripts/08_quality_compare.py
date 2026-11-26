@@ -9,11 +9,12 @@ questions) and questions that flip in both directions. This script pairs the run
   - the pass/fail of the pre-registered rule (drop <= 1.0 point and the interval's worst case <= 2.0 points).
 
   python scripts/08_quality_compare.py --ref results/quality/<ref>/lm_eval --test results/quality/<cfg>/lm_eval
-Reads every samples_<task>_*.jsonl under each folder (lm-eval --log_samples). Metric per task: exact_match for
+Reads every samples_<task>_*.jsonl (or .jsonl.gz, as committed) under each folder (lm-eval --log_samples). Metric per task: exact_match for
 gsm8k (strict-match filter), acc for mmlu_*.
 """
 import argparse
 import glob
+import gzip
 import json
 import math
 import os
@@ -27,15 +28,19 @@ MAX_DROP, MAX_DROP_CI = 1.0, 2.0  # points; pre-registered in the vault decision
 def load(folder):
     """{(group, task, doc_id): 0/1}; group = gsm8k or mmlu (all MMLU subjects pooled)."""
     out = {}
-    for f in glob.glob(os.path.join(folder, "**", "samples_*.jsonl"), recursive=True):
-        task = re.match(r"samples_(.+?)_\d{4}-\d\d-\d\dT", os.path.basename(f))
-        task = task.group(1) if task else os.path.basename(f)[8:-6]
+    files = glob.glob(os.path.join(folder, "**", "samples_*.jsonl"), recursive=True)
+    files += [f for f in glob.glob(os.path.join(folder, "**", "samples_*.jsonl.gz"), recursive=True)
+              if f[:-3] not in files]                       # gzipped copy; the plain file wins if both exist
+    for f in files:
+        name = os.path.basename(f).removesuffix(".gz")
+        task = re.match(r"samples_(.+?)_\d{4}-\d\d-\d\dT", name)
+        task = task.group(1) if task else name[8:-6]
         rule = next(((m, flt) for rx, m, flt in METRIC if rx.match(task)), None)
         if not rule:
             continue
         metric, flt = rule
         group = "gsm8k" if task.startswith("gsm8k") else "mmlu"
-        for line in open(f):
+        for line in (gzip.open(f, "rt") if f.endswith(".gz") else open(f)):
             s = json.loads(line)
             if flt and s.get("filter") != flt:
                 continue

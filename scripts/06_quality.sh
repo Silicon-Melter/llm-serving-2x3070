@@ -10,11 +10,20 @@
 # with the same RUN_ID after a crash only does what is missing. FORCE=1 redoes everything.
 set -uo pipefail
 # stage_done <config dir> <stage>: 0 if that stage's output is complete. A reset can leave 0-byte or cut-off files.
+# samples_nonempty <config dir> <task>: sample files with at least one line, plain or gzipped (committed results are
+# gzipped), one line per file name (a plain file and its .gz copy count once)
+samples_nonempty() { find "$1/lm_eval" \( -name "samples_$2_*.jsonl" -o -name "samples_$2_*.jsonl.gz" \) 2>/dev/null |
+  while read -r f; do
+    case "$f" in
+      *.gz) gzip -t "$f" 2>/dev/null && [ -n "$(gzip -cd "$f" | head -c1)" ] && echo "${f%.gz}" ;;
+      *)    [ -s "$f" ] && echo "$f" ;;
+    esac
+  done | sort -u; }
 stage_done() { local d="$1"
   case "$2" in
     kld)   [ -s "$d/logprobs.jsonl.gz" ] && gzip -t "$d/logprobs.jsonl.gz" 2>/dev/null ;;
-    gsm8k) [ -n "$(find "$d/lm_eval" -name 'samples_gsm8k_*.jsonl' -size +0 2>/dev/null | head -1)" ] ;;
-    mmlu)  [ "$(find "$d/lm_eval" -name 'samples_mmlu_*.jsonl' -size +0 2>/dev/null | wc -l)" -ge 57 ] ;;
+    gsm8k) [ -n "$(samples_nonempty "$d" gsm8k | head -1)" ] ;;
+    mmlu)  [ "$(samples_nonempty "$d" mmlu | wc -l)" -ge 57 ] ;;
     *) return 1 ;;
   esac; }
 [ "${1:-}" = "--stage-done" ] && { stage_done "$2" "$3"; exit $?; }   # used by tests/test_scripts.py

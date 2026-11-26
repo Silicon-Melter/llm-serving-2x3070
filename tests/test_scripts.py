@@ -106,3 +106,20 @@ def test_quality_stage_done_rejects_files_cut_off_by_a_reset(tmp_path):
     assert not _stage_done(d, "mmlu")                                              # 56 of 57 subjects
     (lm / "samples_mmlu_s56_x.jsonl").write_text('{"doc_id": 0}\n')
     assert _stage_done(d, "mmlu")
+
+
+def test_quality_stage_done_reads_gzipped_samples(tmp_path):
+    """Committed results keep lm-eval samples gzipped: a resumed run must still see them as done."""
+    import gzip
+    d = tmp_path / "cfg"; lm = d / "lm_eval" / "m"; lm.mkdir(parents=True)
+    (lm / "samples_gsm8k_x.jsonl.gz").write_bytes(gzip.compress(b""))              # empty inside
+    assert not _stage_done(d, "gsm8k")
+    (lm / "samples_gsm8k_x.jsonl.gz").write_bytes(gzip.compress(b'{"doc_id": 0}\n'))
+    assert _stage_done(d, "gsm8k")
+    for i in range(29):                                                            # 29 subjects, each plain + gz
+        (lm / f"samples_mmlu_s{i}_x.jsonl").write_text('{"doc_id": 0}\n')
+        (lm / f"samples_mmlu_s{i}_x.jsonl.gz").write_bytes(gzip.compress(b'{"doc_id": 0}\n'))
+    assert not _stage_done(d, "mmlu")                                              # 58 files, 29 subjects
+    for i in range(29, 57):
+        (lm / f"samples_mmlu_s{i}_x.jsonl.gz").write_bytes(gzip.compress(b'{"doc_id": 0}\n'))
+    assert _stage_done(d, "mmlu")
