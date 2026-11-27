@@ -37,7 +37,9 @@ will show.
 
 ## Steps
 1. `bash scripts/00_hw_facts.sh > results/hw.txt`
-2. `bash scripts/01_setup.sh` (conda env `serve`, vLLM, SGLang in its own env, nccl-tests).
+2. `bash scripts/01_setup.sh` (conda env `serve`, vLLM, SGLang in its own env, nccl-tests). It ends with
+   `scripts/01b_jit_toolkit.sh`, a CUDA 13.0 toolkit from NVIDIA's wheels that FlashInfer compiles FP8-KV kernels
+   with on sm_86. The venv's own nvcc is 13.5 against 13.0 headers, which CCCL rejects.
 3. `bash scripts/02_nccl.sh` → `results/nccl_allreduce.txt`.
 4. `bash scripts/03_sweep_vllm.sh` (each config: start server, wait, sweep concurrency, stop) → `results/vllm/*.json`.
 5. `bash scripts/04_sweep_sglang.sh` → `results/sglang/*.json`.
