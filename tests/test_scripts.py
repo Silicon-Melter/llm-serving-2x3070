@@ -175,3 +175,33 @@ def test_quality_exits_zero_when_every_stage_is_done(tmp_path):
     r = _quality_run(tmp_path)
     assert "already done, skipped" in r.stdout and "incomplete" not in r.stdout
     assert r.returncode == 0
+
+
+def _configs(script):
+    """The CONFIGS array of a sweep script, evaluated by bash itself (the rest of the script is not run)."""
+    cmd = f'eval "$(sed -n "/^CONFIGS=(/,/^)/p" "{script}")"; printf "%s\\n" "${{CONFIGS[@]}}"'
+    out = subprocess.run(["bash", "-c", cmd], capture_output=True, text=True, check=True).stdout
+    return [line.split("|") for line in out.splitlines()]
+
+
+VARIANT_FLAG = {"_fp8kv": "--kv-cache-dtype fp8", "_fi": "--attention-backend FLASHINFER"}
+
+
+@pytest.mark.parametrize("script", ["03_sweep_vllm.sh", "06_quality.sh"])
+def test_config_tables_change_one_thing_per_variant(script):
+    """Every row has 4 fields and a unique name; a *_fp8kv / *_fi row is its twin plus exactly one flag."""
+    rows = _configs(ROOT / "scripts" / script)
+    assert len(rows) > 5 and all(len(r) == 4 for r in rows)
+    by_name = {r[0]: r for r in rows}
+    assert len(by_name) == len(rows)
+    assert all(gpus in ("0", "1", "0,1") for _, gpus, _, _ in rows)
+    variants = 0
+    for name, gpus, model, extra in rows:
+        for suffix, flag in VARIANT_FLAG.items():
+            if name.endswith(suffix) and name[: -len(suffix)] in by_name:
+                _, tgpus, tmodel, textra = by_name[name[: -len(suffix)]]
+                assert flag in extra, name
+                assert (gpus, model) == (tgpus, tmodel), name
+                assert " ".join(extra.replace(flag, " ").split()) == " ".join(textra.split()), name
+                variants += 1
+    assert variants >= 2
