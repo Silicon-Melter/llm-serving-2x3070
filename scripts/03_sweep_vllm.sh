@@ -71,6 +71,9 @@ CONFIGS=(
   "8b-awq_tp2_fp8kv|0,1|Qwen/Qwen3-8B-AWQ|--tensor-parallel-size 2 --kv-cache-dtype fp8"   # H4 at equal KV dtype (vs 8b-w8a8_tp2_fp8kv)
   "8b-w8a8_tp2_fp8kv_s128|0,1|nm-testing/Qwen3-8B-W8A8-INT8|--tensor-parallel-size 2 --kv-cache-dtype fp8 --max-num-seqs 128"   # T3: c=128
   "8b-awq_tp2_fp8kv_s128|0,1|Qwen/Qwen3-8B-AWQ|--tensor-parallel-size 2 --kv-cache-dtype fp8 --max-num-seqs 128"   # T3: c=128
+  "8b-w8a8_tp2_fp8kv_mbt512|0,1|nm-testing/Qwen3-8B-W8A8-INT8|--tensor-parallel-size 2 --kv-cache-dtype fp8 --max-num-batched-tokens 512"   # prefill chunk (default 2048)
+  "8b-w8a8_tp2_fp8kv_mbt1024|0,1|nm-testing/Qwen3-8B-W8A8-INT8|--tensor-parallel-size 2 --kv-cache-dtype fp8 --max-num-batched-tokens 1024"   # prefill chunk (default 2048)
+  "8b-w8a8_tp2_fp8kv_mbt4096|0,1|nm-testing/Qwen3-8B-W8A8-INT8|--tensor-parallel-size 2 --kv-cache-dtype fp8 --max-num-batched-tokens 4096"   # prefill chunk (default 2048)
   # 8B as 2 copies: with torch.compile (Inductor) the GPU0 copy runs out of memory while autotuning a 2,048-token
   # logits buffer (1.16 GiB), so these run with the Inductor backend off; the _eager 1-GPU and TP=2 runs measure what
   # that costs, so H1 compares like with like.

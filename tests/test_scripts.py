@@ -184,12 +184,13 @@ def _configs(script):
     return [line.split("|") for line in out.splitlines()]
 
 
-VARIANT_FLAG = {"_fp8kv": "--kv-cache-dtype fp8", "_fi": "--attention-backend FLASHINFER", "_s128": "--max-num-seqs 128"}
+VARIANT_FLAG = {"_fp8kv": "--kv-cache-dtype fp8", "_fi": "--attention-backend FLASHINFER", "_s128": "--max-num-seqs 128",
+                **{f"_mbt{n}": f"--max-num-batched-tokens {n}" for n in (512, 1024, 4096)}}
 
 
 @pytest.mark.parametrize("script", ["03_sweep_vllm.sh", "06_quality.sh"])
 def test_config_tables_change_one_thing_per_variant(script):
-    """Every row has 4 fields and a unique name; a *_fp8kv / *_fi row is its twin plus exactly one flag."""
+    """Every row has 4 fields and a unique name; a variant row (VARIANT_FLAG suffix) is its twin plus exactly one flag."""
     rows = _configs(ROOT / "scripts" / script)
     assert len(rows) > 5 and all(len(r) == 4 for r in rows)
     by_name = {r[0]: r for r in rows}
