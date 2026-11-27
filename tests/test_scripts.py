@@ -4,6 +4,7 @@ are missing, so the syntax checks still run on any machine."""
 import gzip
 import os
 import pathlib
+import re
 import subprocess
 
 import pytest
@@ -372,3 +373,19 @@ def test_llamacpp_bench_runs_each_split_on_the_right_cards(tmp_path):
     t2 = (out / "t2-llama3-8b_1gpu_fa0.log").read_text().split()
     assert t2[0] == "CVD=1" and _after(t2, "-fa") == ["0"] and _after(t2, "-n") == ["512"] and "-sm" not in t2
     assert sorted(p.name for p in out.glob("*.json")) == ["t1-qwen3-14b_tensor.json", "t2-llama3-8b_1gpu_fa0.json"]
+
+
+def test_sglang_flags_exist_in_the_installed_sglang():
+    """Every flag 04 passes must be an exact option of the installed SGLang: argparse refuses an ambiguous prefix
+    (0.5.23 split --cuda-graph-max-bs into -decode / -prefill and m5h's first try died on it)."""
+    py = pathlib.Path(os.environ.get("BULK", "/media/earth/SSD2/llm-serving")) / "envs/serve-sglang/bin/python"
+    if not py.exists():
+        pytest.skip(f"SGLang env not set up at {py} (scripts/01_setup.sh)")
+    helptext = subprocess.run([str(py), "-m", "sglang.launch_server", "--help"], capture_output=True, text=True,
+                              env={**os.environ, "CUDA_VISIBLE_DEVICES": ""}, timeout=600).stdout
+    options = set(re.findall(r"--[a-z0-9][a-z0-9-]*", helptext))
+    assert len(options) > 100, helptext[-500:]
+    flags = subprocess.run(["bash", str(ROOT / "scripts/04_sweep_sglang.sh"), "--flags"], capture_output=True,
+                           text=True).stdout.split()
+    assert "--mem-fraction-static" in flags and "--tp-size" in flags
+    assert [f for f in flags if f not in options] == []

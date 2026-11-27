@@ -26,16 +26,21 @@ jit_env() { local c="$BULK/cuda-jit-13.0/nvidia/cu13"
 
 PORT="${PORT:-30000}"; HOST=127.0.0.1
 CONC="${CONC:-1 4 16 64}"; IN="${IN:-512}"; OUTLEN="${OUTLEN:-256}"; REPEAT="${REPEAT:-1}"; SEED=1234
-RUN_ID="${RUN_ID:-$(date +%Y%m%d-%H%M%S)}"; OUT="results/sglang/$RUN_ID"; mkdir -p "$OUT"
 MAX_RUN=64; SMOKE_C=64
 MEM_STEPS="${MEM_STEPS:-0.85 0.82 0.80 0.78 0.75 0.72 0.70 0.65 0.60}"
-COMMON="--context-length 4096 --max-running-requests $MAX_RUN --cuda-graph-max-bs $MAX_RUN --disable-radix-cache --random-seed $SEED --host $HOST --port $PORT"
+# decode CUDA graphs up to the 64 running requests (SGLang 0.5.23 split --cuda-graph-max-bs into -decode / -prefill;
+# the bare name is now an ambiguous prefix and argparse refuses it); prefill graphs keep SGLang's default
+COMMON="--context-length 4096 --max-running-requests $MAX_RUN --cuda-graph-max-bs-decode $MAX_RUN --disable-radix-cache --random-seed $SEED --host $HOST --port $PORT"
 CONFIGS=(   # name | GPUs | model | extra args   (names match 03_sweep_vllm.sh for the same setup)
   "8b-awq_tp2|0,1|Qwen/Qwen3-8B-AWQ|--tp-size 2"
   "8b-awq_dp2|0,1|Qwen/Qwen3-8B-AWQ|--dp-size 2"
   "8b-w8a8_tp2|0,1|nm-testing/Qwen3-8B-W8A8-INT8|--tp-size 2"
   "8b-w8a8_tp2_fp8kv|0,1|nm-testing/Qwen3-8B-W8A8-INT8|--tp-size 2 --kv-cache-dtype fp8_e4m3"
 )
+# --flags: every server flag this script passes, one per line (tests check them against the installed SGLang)
+[ "${1:-}" = "--flags" ] && { for c in "${CONFIGS[@]}"; do echo "$COMMON --mem-fraction-static 0.8 ${c##*|}"; done |
+  tr ' ' '\n' | grep -E '^--' | sort -u; exit 0; }
+RUN_ID="${RUN_ID:-$(date +%Y%m%d-%H%M%S)}"; OUT="results/sglang/$RUN_ID"; mkdir -p "$OUT"
 CPUSET="${CPUSET:-0-19}"
 
 gpu_used() { nvidia-smi --query-gpu=memory.used --format=csv,noheader,nounits -i "$1" | tr -d ' '; }
