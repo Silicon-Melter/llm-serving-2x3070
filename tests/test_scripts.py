@@ -213,3 +213,34 @@ def test_sweep_max_num_seqs_defaults_to_64_and_follows_the_config():
     assert seqs("--tensor-parallel-size 2") == "64" and seqs("") == "64"
     assert seqs("--tensor-parallel-size 2 --kv-cache-dtype fp8 --max-num-seqs 128") == "128"
     assert seqs("--max-num-seqs 32 --tensor-parallel-size 2") == "32"
+
+
+def test_sweep_server_gets_max_num_seqs_exactly_once():
+    """COMMON has no --max-num-seqs: 64 is added for plain configs, nothing when the config sets its own."""
+    arg = lambda extra: subprocess.run(["bash", str(ROOT / "scripts/03_sweep_vllm.sh"), "--seq-arg", extra],  # noqa: E731
+                                       capture_output=True, text=True).stdout.split()
+    assert arg("--tensor-parallel-size 2 --kv-cache-dtype fp8") == ["--max-num-seqs", "64"]
+    assert arg("") == ["--max-num-seqs", "64"]
+    assert arg("--tensor-parallel-size 2 --max-num-seqs 128") == []
+    common = subprocess.run(["bash", "-c", f'grep -E "^COMMON=" "{ROOT / "scripts/03_sweep_vllm.sh"}"'],
+                            capture_output=True, text=True).stdout
+    assert "--max-model-len 4096" in common and "--max-num-seqs" not in common
+
+
+def test_sweep_starts_each_server_with_the_right_max_num_seqs(tmp_path):
+    """The real sweep loop with a vllm that logs its arguments and exits: what each server is started with."""
+    fake = tmp_path / "bin"; fake.mkdir()
+    (fake / "nvidia-smi").write_text("#!/bin/sh\necho 0\n"); (fake / "nvidia-smi").chmod(0o755)
+    venv = tmp_path / "bulk/envs/serve-vllm/bin"; venv.mkdir(parents=True)
+    (venv / "vllm").write_text('#!/bin/sh\necho "ARGS $*"\nexit 1\n'); (venv / "vllm").chmod(0o755)
+    for tool in ("hf", "huggingface-cli"):
+        (venv / tool).write_text("#!/bin/sh\nexit 0\n"); (venv / tool).chmod(0o755)
+    env = {**os.environ, "PATH": f"{fake}:{os.environ['PATH']}", "BULK": str(tmp_path / "bulk"), "PORT": "59996",
+           "RUN_ID": "t", "ONLY": "8b-awq_tp2 8b-awq_tp2_fp8kv_s128", "CPUSET": "0", "KV_STEPS": "0.95"}
+    r = subprocess.run(["bash", str(ROOT / "scripts/03_sweep_vllm.sh")], cwd=tmp_path, capture_output=True, text=True,
+                       env=env, timeout=120)
+    assert r.stdout.count("does not fit") == 2, r.stdout
+    args = lambda name: (tmp_path / f"results/vllm/t/{name}.try-auto.log").read_text().split()  # noqa: E731
+    plain, s128 = args("8b-awq_tp2"), args("8b-awq_tp2_fp8kv_s128")
+    assert plain.count("--max-num-seqs") == 1 and plain[plain.index("--max-num-seqs") + 1] == "64"
+    assert s128.count("--max-num-seqs") == 1 and s128[s128.index("--max-num-seqs") + 1] == "128"

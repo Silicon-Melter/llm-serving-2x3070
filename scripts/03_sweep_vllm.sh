@@ -31,9 +31,12 @@ kv_env() {
 [ "${1:-}" = "--kv-env" ] && { kv_env "$2"; exit 0; }
 # seqs_of <extra args>: the config's own --max-num-seqs, else 64 (= the highest concurrency in the default CONC)
 seqs_of() { local s; s=$(grep -oE -- "--max-num-seqs [0-9]+" <<<"$1" | tail -1 | cut -d" " -f2); echo "${s:-64}"; }
+# seq_arg <extra args>: what to add to COMMON: --max-num-seqs 64 unless the config sets its own
+seq_arg() { [[ " $1 " == *" --max-num-seqs "* ]] || echo "--max-num-seqs $(seqs_of "$1")"; }
 [ "${1:-}" = "--seqs" ] && { seqs_of "$2"; exit 0; }
+[ "${1:-}" = "--seq-arg" ] && { seq_arg "$2"; exit 0; }
 export HF_HUB_CACHE="${HF_HUB_CACHE:-$BULK/hf}"
-PORT=8000; HOST=127.0.0.1                     # 127.0.0.1, not localhost (name lookup adds latency)
+PORT="${PORT:-8000}"; HOST=127.0.0.1                     # 127.0.0.1, not localhost (name lookup adds latency)
 CONC="${CONC:-1 4 16 64}"; IN=512; OUTLEN=256; REPEAT="${REPEAT:-1}"; SEED=1234
 RUN_ID="${RUN_ID:-$(date +%Y%m%d-%H%M%S)}"; OUT="results/vllm/$RUN_ID"; mkdir -p "$OUT"
 # Prefix caching off: random prompts must not hit a cache. Same max length everywhere so KV budgets compare.
@@ -126,7 +129,7 @@ for c in "${CONFIGS[@]}"; do
   IFS='|' read -r NAME GPUS MODEL EXTRA <<<"$c"
   [ -n "${ONLY:-}" ] && [[ " $ONLY " != *" $NAME "* ]] && continue
   echo "=== $NAME (GPUs $GPUS)"
-  SMOKE_C=$(seqs_of "$EXTRA"); SEQ_ARG=""; [[ " $EXTRA " == *" --max-num-seqs "* ]] || SEQ_ARG="--max-num-seqs $SMOKE_C"
+  SMOKE_C=$(seqs_of "$EXTRA"); SEQ_ARG=$(seq_arg "$EXTRA")
   "$VENV/bin/hf" download "$MODEL" >/dev/null 2>&1 || "$VENV/bin/huggingface-cli" download "$MODEL" >/dev/null   # outside the health timeout
   wait_idle || { echo "  GPUs busy before start, stopping"; exit 1; }
   # KV rule (same for every config): the largest KV size that both starts and survives a c=SMOKE_C burst.
