@@ -1,0 +1,35 @@
+{
+ "gsm8k": {
+  "n": 1319,
+  "acc_ref": 87.94541319181198,
+  "acc_test": 87.49052312357847,
+  "diff_points": -0.45489006823351025,
+  "diff_ci95": [
+   -1.819560272934041,
+   0.9097801364670205
+  ],
+  "right_to_wrong": 44,
+  "wrong_to_right": 38,
+  "flip_rate": 6.21683093252464,
+  "mcnemar_p": 0.5811144541766469,
+  "passes": true
+ },
+ "mmlu": {
+  "n": 1140,
+  "acc_ref": 77.45614035087719,
+  "acc_test": 78.0701754385965,
+  "diff_points": 0.6140350877192983,
+  "diff_ci95": [
+   -0.6140350877192983,
+   1.7543859649122806
+  ],
+  "right_to_wrong": 20,
+  "wrong_to_right": 27,
+  "flip_rate": 4.12280701754386,
+  "mcnemar_p": 0.38169339766321286,
+  "passes": true
+ },
+ "passes": true,
+ "ref": "results/quality/m4-18e63e5/ref8b-bf16_tp2",
+ "test": "results/quality/m4-18e63e5/8b-w8a8_tp2_fp8kv"
+}

@@ -80,3 +80,39 @@ driver 595.99.02
 vllm 0.34.0 torch 2.14.0+cu130 cuda 13.0 nccl (2, 30, 7)
 sglang 0.5.23 torch 2.14.1+cu130 cuda 13.0
 nccl-tests built against /media/earth/SSD2/llm-serving/envs/serve-vllm/lib/python3.12/site-packages/nvidia/nccl
+run_id m4-18e63e5
+stages kld gsm8k mmlu
+mmlu_limit 20 gsm8k_limit all
+concurrency 32
+common --max-model-len 4096 --max-num-seqs 32 --port 8000 --host 127.0.0.1 --seed 1234
+cpuset 0-2,4-18 pythonpath 
+started 2026-11-26T20:08:17+07:00 commit 535f67b
+date 2026-11-22T13:06:27+07:00
+driver 595.99.02
+vllm 0.34.0 torch 2.14.0+cu130 cuda 13.0 nccl (2, 30, 7)
+sglang 0.5.23 torch 2.14.1+cu130 cuda 13.0
+nccl-tests built against /media/earth/SSD2/llm-serving/envs/serve-vllm/lib/python3.12/site-packages/nvidia/nccl
+run_id m4-18e63e5
+stages kld gsm8k mmlu
+mmlu_limit 20 gsm8k_limit all
+concurrency 32
+common --max-model-len 4096 --max-num-seqs 32 --port 8000 --host 127.0.0.1 --seed 1234
+cpuset 0-2,4-18 pythonpath 
+started 2026-11-27T12:39:28+07:00 commit f3d1502
+date 2026-11-22T13:06:27+07:00
+driver 595.99.02
+vllm 0.34.0 torch 2.14.0+cu130 cuda 13.0 nccl (2, 30, 7)
+sglang 0.5.23 torch 2.14.1+cu130 cuda 13.0
+nccl-tests built against /media/earth/SSD2/llm-serving/envs/serve-vllm/lib/python3.12/site-packages/nvidia/nccl
+run_id m4-18e63e5
+stages kld gsm8k mmlu
+mmlu_limit 20 gsm8k_limit all
+concurrency 32
+common --max-model-len 4096 --max-num-seqs 32 --port 8000 --host 127.0.0.1 --seed 1234
+cpuset 0-2,4-18 pythonpath 
+started 2026-11-27T13:15:15+07:00 commit f3d1502
+date 2026-11-22T13:06:27+07:00
+driver 595.99.02
+vllm 0.34.0 torch 2.14.0+cu130 cuda 13.0 nccl (2, 30, 7)
+sglang 0.5.23 torch 2.14.1+cu130 cuda 13.0
+nccl-tests built against /media/earth/SSD2/llm-serving/envs/serve-vllm/lib/python3.12/site-packages/nvidia/nccl

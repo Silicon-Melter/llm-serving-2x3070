@@ -1,0 +1,24 @@
+{
+ "positions": 65408,
+ "passages": 128,
+ "kl_mean": 0.039056947552798565,
+ "kl_mean_ci95": [
+  0.037818655459368904,
+  0.04043683537393493
+ ],
+ "kl_p99": 0.36540169442154513,
+ "top1_agree": 0.9061735567514677,
+ "top1_agree_ci95": [
+  0.9038191046966731,
+  0.9084362769080235
+ ],
+ "ppl_ref": 12.65883578054291,
+ "ppl_test": 12.515323573279632,
+ "ppl_rel_change": -0.011336919899368691,
+ "ppl_rel_change_ci95": [
+  -0.015591736291848846,
+  -0.00736115579756913
+ ],
+ "ref": "results/quality/m4-18e63e5/ref8b-bf16_tp2/logprobs.jsonl.gz",
+ "test": "results/quality/m4-18e63e5/8b-w8a8_tp2_fp8kv/logprobs.jsonl.gz"
+}

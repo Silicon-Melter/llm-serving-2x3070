@@ -1,0 +1,10 @@
+run_id m5a-6b95fd4
+cpuset 0-2,4-18
+idle_mib gpu0 684 gpu1 18
+date 2026-11-22T13:06:27+07:00
+driver 595.99.02
+vllm 0.34.0 torch 2.14.0+cu130 cuda 13.0 nccl (2, 30, 7)
+sglang 0.5.23 torch 2.14.1+cu130 cuda 13.0
+nccl-tests built against /media/earth/SSD2/llm-serving/envs/serve-vllm/lib/python3.12/site-packages/nvidia/nccl
+common --max-model-len 4096 --max-num-seqs 64 --disable-prefix-caching --port 8000 --host 127.0.0.1
+in 512 out 256 seed 1234
