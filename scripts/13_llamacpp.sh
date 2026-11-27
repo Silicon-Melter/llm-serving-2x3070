@@ -34,10 +34,13 @@ gguf_path() { local f="${GGUF[$1]#*|}"; echo "$G/$1/$f"; }
 [ "${1:-}" = "--gguf-path" ] && { gguf_path "$2"; exit 0; }
 
 if [[ " $STEPS " == *" build "* ]]; then
-  if [ ! -x "$CT/bin/nvcc" ]; then
+  # nvml.h: ggml-cuda includes it (cuda-nvml-dev); a missing package is installed into an existing env
+  PKGS="cuda-version=13.0 cuda-nvcc=13.0 cuda-cudart-dev=13.0 libcublas-dev cuda-nvml-dev cmake ninja"
+  if [ ! -x "$CT/bin/nvcc" ] || [ ! -e "$CT/targets/x86_64-linux/include/nvml.h" ]; then
     set +u; eval "$(conda shell.bash hook)"   # conda's scripts read unset variables
-    conda create -y -q -p "$CT" -c nvidia -c conda-forge cuda-version=13.0 cuda-nvcc=13.0 cuda-cudart-dev=13.0 \
-      libcublas-dev cmake ninja; set -u
+    if [ -d "$CT/conda-meta" ]; then conda install -y -q -p "$CT" -c nvidia -c conda-forge $PKGS
+    else conda create -y -q -p "$CT" -c nvidia -c conda-forge $PKGS; fi
+    set -u
   fi
   [ -d "$SRC/.git" ] || git clone -q https://github.com/ggml-org/llama.cpp.git "$SRC"
   [ -n "$LLAMA_REF" ] && git -C "$SRC" checkout -q "$LLAMA_REF"
