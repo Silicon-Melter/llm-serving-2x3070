@@ -279,3 +279,72 @@ def test_sweep_prompt_length_can_be_set(tmp_path):
     _, words = _fake_sweep(tmp_path, IN="120", OUTLEN="200", ONLY="8b-awq_tp2")
     assert _after(words("8b-awq_tp2.try-auto.smoke.log"), "--random-input-len") == ["120"]
     run = words("run.txt"); assert run[run.index("in") + 1] == "120" and run[run.index("out") + 1] == "200"
+
+
+def test_sglang_kv_tokens_takes_the_smallest_rank(tmp_path):
+    log = tmp_path / "s.log"
+    log.write_text("[TP0] max_total_num_tokens=51234, chunked_prefill_size=2048\n[TP1] max_total_num_tokens=50990, x\n")
+    out = subprocess.run(["bash", str(ROOT / "scripts/04_sweep_sglang.sh"), "--kv-tokens", str(log)],
+                         capture_output=True, text=True).stdout.strip()
+    assert out == "50990"
+
+
+@pytest.mark.parametrize("text,ok", [
+    ("Successful requests:                     128\nFailed requests:                         0\n", True),
+    ("Successful requests:                     120\nFailed requests:                         8\n", False),
+    ("Successful requests:                     0\n", False),
+])
+def test_sglang_bench_ok_matches_the_vllm_sweep(tmp_path, text, ok):
+    log = tmp_path / "b.log"; log.write_text(text)
+    for script in ("03_sweep_vllm.sh", "04_sweep_sglang.sh"):
+        r = subprocess.run(["bash", str(ROOT / "scripts" / script), "--check-bench-log", str(log)])
+        assert (r.returncode == 0) == ok, script
+
+
+def test_sglang_uses_the_same_jit_toolkit_as_vllm_fp8_kv():
+    sgl = dict(kv.split("=", 1) for kv in subprocess.run(
+        ["bash", str(ROOT / "scripts/04_sweep_sglang.sh"), "--jit-env"], capture_output=True, text=True,
+        env={**os.environ, "BULK": "/b"}).stdout.split())
+    vll = dict(kv.split("=", 1) for kv in subprocess.run(
+        ["bash", str(ROOT / "scripts/03_sweep_vllm.sh"), "--kv-env", "--kv-cache-dtype fp8"], capture_output=True,
+        text=True, env={**os.environ, "BULK": "/b"}).stdout.split())
+    assert sgl["CUDA_HOME"] == vll["CUDA_HOME"] == "/b/cuda-jit-13.0/nvidia/cu13"
+    assert sgl["PATH"].split(":")[:2] == ["/b/envs/serve-sglang/bin", sgl["CUDA_HOME"] + "/bin"]   # SGLang's ninja
+    assert sgl["FLASHINFER_CUDA_ARCH_LIST"] == "8.6"
+
+
+def test_sglang_sweep_starts_servers_and_benches_like_the_vllm_sweep(tmp_path):
+    """The real 04 loop against a fake SGLang server (answers /health, logs its arguments) and a fake bench client
+    that fails, so the mem-fraction ladder runs to the end."""
+    fake = tmp_path / "bin"; fake.mkdir()
+    (fake / "nvidia-smi").write_text("#!/bin/sh\necho 0\n"); (fake / "nvidia-smi").chmod(0o755)
+    www = tmp_path / "www"; www.mkdir(); (www / "health").write_text("ok")
+    (tmp_path / "server.py").write_text(
+        "import functools, http.server, signal\n"
+        "signal.signal(signal.SIGINT, signal.default_int_handler)\n"
+        f"h = functools.partial(http.server.SimpleHTTPRequestHandler, directory={str(www)!r})\n"
+        "http.server.ThreadingHTTPServer(('127.0.0.1', 59995), h).serve_forever()\n")
+    sgl = tmp_path / "bulk/envs/serve-sglang/bin"; sgl.mkdir(parents=True)
+    (sgl / "python").write_text(f"""#!/bin/sh
+echo "ARGS $*"
+[ "$2" = sglang.launch_server ] && {{ echo "max_total_num_tokens=4321, x"; exec python3 -I {tmp_path / "server.py"} 2>/dev/null; }}
+exit 0
+""")
+    vll = tmp_path / "bulk/envs/serve-vllm/bin"; vll.mkdir(parents=True)
+    (vll / "vllm").write_text('#!/bin/sh\necho "ARGS $*"\nexit 1\n')
+    for f in (sgl / "python", vll / "vllm"):
+        f.chmod(0o755)
+    env = {**os.environ, "PATH": f"{fake}:{os.environ['PATH']}", "BULK": str(tmp_path / "bulk"), "PORT": "59995",
+           "RUN_ID": "t", "ONLY": "8b-w8a8_tp2_fp8kv", "CPUSET": "0", "MEM_STEPS": "0.85 0.80"}
+    r = subprocess.run(["bash", str(ROOT / "scripts/04_sweep_sglang.sh")], cwd=tmp_path, capture_output=True,
+                       text=True, env=env, timeout=180)
+    assert r.stdout.count("failed the c=64 smoke test") == 2 and "does not fit" in r.stdout, r.stdout
+    out = tmp_path / "results/sglang/t"
+    server = (out / "8b-w8a8_tp2_fp8kv.try-0.85.log").read_text().split()
+    assert _after(server, "--mem-fraction-static") == ["0.85"] and _after(server, "--max-running-requests") == ["64"]
+    assert _after(server, "--host") == ["127.0.0.1"] and "--disable-radix-cache" in server
+    assert _after(server, "--kv-cache-dtype") == ["fp8_e4m3"] and _after(server, "--tp-size") == ["2"]
+    smoke = (out / "8b-w8a8_tp2_fp8kv.try-0.80.smoke.log").read_text().split()
+    assert _after(smoke, "--backend") == ["openai"] and _after(smoke, "--max-concurrency") == ["64"]
+    assert "--ignore-eos" in smoke and _after(smoke, "--temperature") == ["0"]
+    assert _after(smoke, "--random-input-len") == ["512"]

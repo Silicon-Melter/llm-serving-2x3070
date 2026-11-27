@@ -49,3 +49,18 @@ def test_summarise_repeats_and_efficiency(results):
     dp = df.loc[("8b-awq_dp2", 16)]
     assert dp.eff_same_conc == pytest.approx(660.0 / (2 * 350.0))
     assert dp.eff_same_load_per_gpu == pytest.approx(660.0 / (2 * 300.0))   # vs 1 GPU at c=8
+
+
+def test_sglang_runs_load_with_their_engine_and_kv_size(results):
+    run = results / "sglang" / "runS"; run.mkdir(parents=True)
+    (run / "8b-awq_tp2.server.txt").write_text("mem_fraction_static 0.80\nmax_total_num_tokens=51234\n")
+    write(run, "8b-awq_tp2_c16_r1.json", 700.0)
+    (results / "quality" / "m4" / "x").mkdir(parents=True)                       # other result folders are ignored
+    (results / "quality" / "m4" / "x_c1_r1.json").write_text(json.dumps({"completed": 1, "output_throughput": 1}))
+    raw = analyse.load(str(results))
+    sgl = raw[raw.engine == "sglang"]
+    assert len(sgl) == 1 and sgl.iloc[0].kv_tokens == 51234 and sgl.iloc[0].config == "8b-awq_tp2"
+    assert set(raw.engine) == {"vllm", "sglang"} and len(raw) == 5
+    assert set(analyse.load(str(results), runs=["runS"]).engine) == {"sglang"}
+    df = analyse.summarise(raw, usd_per_gpu_hour=0.15)
+    assert len(df[(df.config == "8b-awq_tp2") & (df.engine == "sglang")]) == 1   # engines are not pooled

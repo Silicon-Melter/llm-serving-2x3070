@@ -1,7 +1,8 @@
 """Collect vLLM bench JSONs into one table, compute scaling efficiency and cost, draw the charts.
 Usage: python scripts/05_analyse.py results/ [--usd-per-gpu-hour 0.15] [--runs RUN_ID ...]
-Reads results/vllm/<run-id>/<config>_c<C>_r<k>.json (written by 03_sweep_vllm.sh, vLLM 0.34 key names) and the
-matching <config>.server.txt for the KV-cache size. Repeats are averaged; min and max are kept as the spread."""
+Reads results/<engine>/<run-id>/<config>_c<C>_r<k>.json for engine vllm (03_sweep_vllm.sh) and sglang
+(04_sweep_sglang.sh; same bench client, so the same vLLM 0.34 key names) and the matching <config>.server.txt for
+the KV-cache size. Repeats are averaged; min and max are kept as the spread."""
 import argparse
 import glob
 import json
@@ -17,19 +18,24 @@ KEYS = {  # column -> vLLM 0.34 result key
 }
 
 
+ENGINES = ("vllm", "sglang")   # results/<engine>/<run>/
+
+
 def kv_tokens(run_dir, config):
     try:
         txt = open(os.path.join(run_dir, f"{config}.server.txt")).read()
     except OSError:
         return None
-    m = re.search(r"GPU KV cache size: ([\d,]+) tokens", txt)
+    m = re.search(r"GPU KV cache size: ([\d,]+) tokens", txt) or re.search(r"max_total_num_tokens=(\d+)", txt)  # vLLM / SGLang
     return int(m.group(1).replace(",", "")) if m else None
 
 
 def load(results, runs=None):
     rows = []
-    for f in sorted(glob.glob(os.path.join(results, "vllm", "*", "*.json"))):
-        run = os.path.basename(os.path.dirname(f))
+    for f in sorted(glob.glob(os.path.join(results, "*", "*", "*.json"))):
+        run = os.path.basename(os.path.dirname(f)); engine = os.path.basename(os.path.dirname(os.path.dirname(f)))
+        if engine not in ENGINES:
+            continue
         m = re.fullmatch(r"(.+)_c(\d+)_r(\d+)\.json", os.path.basename(f))
         if not m or (runs and run not in runs):
             continue
@@ -37,7 +43,7 @@ def load(results, runs=None):
         if not d.get("completed") or d.get("failed"):
             continue  # a run with failed requests is not a measurement
         cfg, conc, rep = m.group(1), int(m.group(2)), int(m.group(3))
-        row = dict(engine="vllm", run=run, config=cfg, concurrency=conc, repeat=rep,
+        row = dict(engine=engine, run=run, config=cfg, concurrency=conc, repeat=rep,
                    gpus=1 if "1gpu" in cfg else 2, kv_tokens=kv_tokens(os.path.dirname(f), cfg))
         row.update({k: d.get(v) for k, v in KEYS.items()})
         rows.append(row)
