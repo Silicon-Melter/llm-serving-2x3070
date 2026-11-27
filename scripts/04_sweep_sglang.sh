@@ -18,11 +18,16 @@ bench_ok() {  # bench_ok <bench log>: at least one request succeeded and none fa
 }
 kv_tokens_of() {  # kv_tokens_of <server log>: smallest max_total_num_tokens over ranks / replicas
   grep -oE "max_total_num_tokens=[0-9]+" "$1" | cut -d= -f2 | sort -n | head -1; }
+fail_reason() {  # fail_reason <server log>: the line that says why it stopped (an OOM first; the custom all-reduce
+  # "peer access is not supported" warning appears on every start here and is not a cause)
+  { grep -m1 -E 'out of memory|OutOfMemoryError' "$1" || grep -m1 -E '(Value|Runtime|Assertion)Error:' "$1" ||
+    grep -m1 -E 'Error|error' "$1"; } | sed 's/^.*\] //' | cut -c1-160; }
 jit_env() { local c="$BULK/cuda-jit-13.0/nvidia/cu13"
   echo "CUDA_HOME=$c PATH=$SGL/bin:$c/bin:$PATH FLASHINFER_WORKSPACE_BASE=$BULK/flashinfer-ws-sgl FLASHINFER_CUDA_ARCH_LIST=8.6"; }
 [ "${1:-}" = "--check-bench-log" ] && { bench_ok "$2"; exit $?; }   # hooks used by tests/test_scripts.py
 [ "${1:-}" = "--kv-tokens" ] && { kv_tokens_of "$2"; exit 0; }
 [ "${1:-}" = "--jit-env" ] && { jit_env; exit 0; }
+[ "${1:-}" = "--fail-reason" ] && { fail_reason "$2"; exit 0; }
 
 PORT="${PORT:-30000}"; HOST=127.0.0.1
 CONC="${CONC:-1 4 16 64}"; IN="${IN:-512}"; OUTLEN="${OUTLEN:-256}"; REPEAT="${REPEAT:-1}"; SEED=1234
@@ -36,6 +41,7 @@ CONFIGS=(   # name | GPUs | model | extra args   (names match 03_sweep_vllm.sh f
   "8b-awq_dp2|0,1|Qwen/Qwen3-8B-AWQ|--dp-size 2"
   "8b-w8a8_tp2|0,1|nm-testing/Qwen3-8B-W8A8-INT8|--tp-size 2"
   "8b-w8a8_tp2_fp8kv|0,1|nm-testing/Qwen3-8B-W8A8-INT8|--tp-size 2 --kv-cache-dtype fp8_e4m3"
+  "8b-w8a8_tp2_fp8kv_nopg|0,1|nm-testing/Qwen3-8B-W8A8-INT8|--tp-size 2 --kv-cache-dtype fp8_e4m3 --disable-prefill-cuda-graph"   # does the prefill graph cost the KV?
 )
 # --flags: every server flag this script passes, one per line (tests check them against the installed SGLang)
 [ "${1:-}" = "--flags" ] && { for c in "${CONFIGS[@]}"; do echo "$COMMON --mem-fraction-static 0.8 ${c##*|}"; done |
@@ -66,12 +72,12 @@ try_start() {  # try_start <mem fraction>: 0 = up and survived the smoke burst (
   for _ in $(seq 1 480); do curl -sf "http://$HOST:$PORT/health" >/dev/null && { up=1; break; }
     kill -0 "$SPID" 2>/dev/null || break; sleep 5; done
   if [ -z "$up" ]; then
-    echo "  did not start ($F): $(grep -m1 -E 'out of memory|Error|error' "$LOG" | sed 's/^.*\] //' | cut -c1-140)"
+    echo "  did not start ($F): $(fail_reason "$LOG")"
     stop_server "$SPID" || exit 1; return 1; fi
   if bench "$OUT/$NAME.try-$F.smoke.log" --random-input-len $IN --random-output-len 16 --num-prompts $((2 * SMOKE_C)) \
        --max-concurrency $SMOKE_C && curl -sf "http://$HOST:$PORT/health" >/dev/null; then
     echo "  ok ($F): $(kv_tokens_of "$LOG") KV tokens"; return 0; fi
-  echo "  started but failed the c=$SMOKE_C smoke test ($F): $(grep -m1 -E 'out of memory|Error' "$LOG" | sed 's/^.*\] //' | cut -c1-140)"
+  echo "  started but failed the c=$SMOKE_C smoke test ($F): $(fail_reason "$LOG")"
   stop_server "$SPID" || exit 1; return 1; }
 
 { echo "run_id $RUN_ID"; echo "engine sglang $("$SGL/bin/python" -c 'import sglang; print(sglang.__version__)' 2>/dev/null)"

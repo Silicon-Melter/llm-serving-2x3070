@@ -389,3 +389,15 @@ def test_sglang_flags_exist_in_the_installed_sglang():
                            text=True).stdout.split()
     assert "--mem-fraction-static" in flags and "--tp-size" in flags
     assert [f for f in flags if f not in options] == []
+
+
+def test_sglang_fail_reason_skips_the_peer_access_warning(tmp_path):
+    log = tmp_path / "s.log"
+    log.write_text("[2026-11-27 22:04:00 TP0] Setup Custom allreduce failed with CUDART error: peer access is not supported\n"
+                   "[2026-11-27 22:04:18 TP0] AcceleratorError: CUDA error: out of memory\n"
+                   "RuntimeError: NCCL error: unhandled cuda error\n")
+    reason = lambda: subprocess.run(["bash", str(ROOT / "scripts/04_sweep_sglang.sh"), "--fail-reason", str(log)],  # noqa: E731
+                                    capture_output=True, text=True).stdout.strip()
+    assert reason() == "AcceleratorError: CUDA error: out of memory"
+    log.write_text("Setup Custom allreduce failed with CUDART error: peer access\nValueError: Loaded weights leave no GPU memory\n")
+    assert reason() == "ValueError: Loaded weights leave no GPU memory"
