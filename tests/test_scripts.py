@@ -184,7 +184,7 @@ def _configs(script):
     return [line.split("|") for line in out.splitlines()]
 
 
-VARIANT_FLAG = {"_fp8kv": "--kv-cache-dtype fp8", "_fi": "--attention-backend FLASHINFER"}
+VARIANT_FLAG = {"_fp8kv": "--kv-cache-dtype fp8", "_fi": "--attention-backend FLASHINFER", "_s128": "--max-num-seqs 128"}
 
 
 @pytest.mark.parametrize("script", ["03_sweep_vllm.sh", "06_quality.sh"])
@@ -205,3 +205,11 @@ def test_config_tables_change_one_thing_per_variant(script):
                 assert " ".join(extra.replace(flag, " ").split()) == " ".join(textra.split()), name
                 variants += 1
     assert variants >= 2
+
+
+def test_sweep_max_num_seqs_defaults_to_64_and_follows_the_config():
+    seqs = lambda extra: subprocess.run(["bash", str(ROOT / "scripts/03_sweep_vllm.sh"), "--seqs", extra],  # noqa: E731
+                                        capture_output=True, text=True).stdout.strip()
+    assert seqs("--tensor-parallel-size 2") == "64" and seqs("") == "64"
+    assert seqs("--tensor-parallel-size 2 --kv-cache-dtype fp8 --max-num-seqs 128") == "128"
+    assert seqs("--max-num-seqs 32 --tensor-parallel-size 2") == "32"

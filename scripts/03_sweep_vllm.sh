@@ -29,13 +29,17 @@ kv_env() {
 [ "${1:-}" = "--check-bench-log" ] && { bench_ok "$2"; exit $?; }   # used by tests/test_scripts.py
 [ "${1:-}" = "--parse-kv-log" ] && { echo "$(kv_suggest "$2") $(kv_auto "$2")"; exit 0; }
 [ "${1:-}" = "--kv-env" ] && { kv_env "$2"; exit 0; }
+# seqs_of <extra args>: the config's own --max-num-seqs, else 64 (= the highest concurrency in the default CONC)
+seqs_of() { local s; s=$(grep -oE -- "--max-num-seqs [0-9]+" <<<"$1" | tail -1 | cut -d" " -f2); echo "${s:-64}"; }
+[ "${1:-}" = "--seqs" ] && { seqs_of "$2"; exit 0; }
 export HF_HUB_CACHE="${HF_HUB_CACHE:-$BULK/hf}"
 PORT=8000; HOST=127.0.0.1                     # 127.0.0.1, not localhost (name lookup adds latency)
 CONC="${CONC:-1 4 16 64}"; IN=512; OUTLEN=256; REPEAT="${REPEAT:-1}"; SEED=1234
 RUN_ID="${RUN_ID:-$(date +%Y%m%d-%H%M%S)}"; OUT="results/vllm/$RUN_ID"; mkdir -p "$OUT"
 # Prefix caching off: random prompts must not hit a cache. Same max length everywhere so KV budgets compare.
 # --max-num-seqs 64 = the highest concurrency tested; vLLM's default (256) reserves sampler memory for 256 requests.
-COMMON="--max-model-len 4096 --max-num-seqs 64 --disable-prefix-caching --port $PORT --host $HOST"
+# A config may set its own --max-num-seqs (the *_s128 configs); the smoke test then runs at that concurrency.
+COMMON="--max-model-len 4096 --disable-prefix-caching --port $PORT --host $HOST"
 # KV sizing (vLLM 0.34 extensible KV cache): try vLLM's automatic sizing first. On an 8 GB card it can fail
 # ("0 KV cache blocks fit"); then step down from the log's "--kv-cache-memory=<X> ... to fully utilize" suggestion
 # in 5 % steps until the server starts, and record the size used. (Explicit --gpu-memory-utilization is not used:
@@ -62,6 +66,8 @@ CONFIGS=(
   "8b-w8a8_tp2_fp8kv|0,1|nm-testing/Qwen3-8B-W8A8-INT8|--tensor-parallel-size 2 --kv-cache-dtype fp8"   # M5 step 2
   "8b-w8a8_tp2_fi|0,1|nm-testing/Qwen3-8B-W8A8-INT8|--tensor-parallel-size 2 --attention-backend FLASHINFER"   # control: FlashInfer, BF16 KV
   "8b-awq_tp2_fp8kv|0,1|Qwen/Qwen3-8B-AWQ|--tensor-parallel-size 2 --kv-cache-dtype fp8"   # H4 at equal KV dtype (vs 8b-w8a8_tp2_fp8kv)
+  "8b-w8a8_tp2_fp8kv_s128|0,1|nm-testing/Qwen3-8B-W8A8-INT8|--tensor-parallel-size 2 --kv-cache-dtype fp8 --max-num-seqs 128"   # T3: c=128
+  "8b-awq_tp2_fp8kv_s128|0,1|Qwen/Qwen3-8B-AWQ|--tensor-parallel-size 2 --kv-cache-dtype fp8 --max-num-seqs 128"   # T3: c=128
   # 8B as 2 copies: with torch.compile (Inductor) the GPU0 copy runs out of memory while autotuning a 2,048-token
   # logits buffer (1.16 GiB), so these run with the Inductor backend off; the _eager 1-GPU and TP=2 runs measure what
   # that costs, so H1 compares like with like.
@@ -92,11 +98,11 @@ bench() {  # bench <logfile> <args...>: run vllm bench serve; succeed only if ev
     --random-range-ratio 0 --ignore-eos --temperature 0 "$@" > "$log" 2>&1 || return 1
   bench_ok "$log"
 }
-SMOKE_C=64   # a KV size is accepted only if the server also survives a burst at the highest concurrency tested
+SMOKE_C=64   # per config: seqs_of; a KV size is accepted only if the server also survives a burst at that concurrency
 try_start() {  # try_start <label> <kv args>: start the server; 0 = up and survived the smoke test (left running)
   local A="$1" KVA="$2" i up=""
   LOG="$OUT/$NAME.try-$A.log"
-  CUDA_VISIBLE_DEVICES=$GPUS setsid taskset -c "$CPUSET" env $(kv_env "$EXTRA") "$VENV/bin/vllm" serve "$MODEL" $COMMON $KVA $EXTRA > "$LOG" 2>&1 &
+  CUDA_VISIBLE_DEVICES=$GPUS setsid taskset -c "$CPUSET" env $(kv_env "$EXTRA") "$VENV/bin/vllm" serve "$MODEL" $COMMON $SEQ_ARG $KVA $EXTRA > "$LOG" 2>&1 &
   SPID=$!
   local tries=180; [ -n "$(kv_env "$EXTRA")" ] && tries=480   # first FP8-KV start compiles FlashInfer kernels
   for i in $(seq 1 $tries); do
@@ -115,11 +121,12 @@ try_start() {  # try_start <label> <kv args>: start the server; 0 = up and survi
   stop_server "$SPID" || exit 1; return 1
 }
 
-{ echo "run_id $RUN_ID"; echo "cpuset $CPUSET"; echo "idle_mib gpu0 ${IDLE[0]} gpu1 ${IDLE[1]}"; cat results/versions.txt 2>/dev/null; echo "common $COMMON"; echo "in $IN out $OUTLEN seed $SEED"; } > "$OUT/run.txt"
+{ echo "run_id $RUN_ID"; echo "cpuset $CPUSET"; echo "idle_mib gpu0 ${IDLE[0]} gpu1 ${IDLE[1]}"; cat results/versions.txt 2>/dev/null; echo "common $COMMON (+ --max-num-seqs 64 unless the config sets it)"; echo "in $IN out $OUTLEN seed $SEED"; } > "$OUT/run.txt"
 for c in "${CONFIGS[@]}"; do
   IFS='|' read -r NAME GPUS MODEL EXTRA <<<"$c"
   [ -n "${ONLY:-}" ] && [[ " $ONLY " != *" $NAME "* ]] && continue
   echo "=== $NAME (GPUs $GPUS)"
+  SMOKE_C=$(seqs_of "$EXTRA"); SEQ_ARG=""; [[ " $EXTRA " == *" --max-num-seqs "* ]] || SEQ_ARG="--max-num-seqs $SMOKE_C"
   "$VENV/bin/hf" download "$MODEL" >/dev/null 2>&1 || "$VENV/bin/huggingface-cli" download "$MODEL" >/dev/null   # outside the health timeout
   wait_idle || { echo "  GPUs busy before start, stopping"; exit 1; }
   # KV rule (same for every config): the largest KV size that both starts and survives a c=SMOKE_C burst.
