@@ -32,3 +32,4 @@ CUDA_BUILD="$BULK/envs/cuda-build"
 make -C "$BULK/build/nccl-tests" -j16 CUDA_HOME="$CUDA_BUILD" CUDA_LIB="$CUDA_BUILD/targets/x86_64-linux/lib" \
   CUDA_INC="$CUDA_BUILD/targets/x86_64-linux/include" NCCL_HOME="$NCCL_HOME" NVCC_GENCODE="-gencode=arch=compute_86,code=sm_86" >/dev/null
 echo "nccl-tests built against $NCCL_HOME" | tee -a results/versions.txt
+BULK="$BULK" bash "$(dirname "$0")/01b_jit_toolkit.sh" | tee -a results/versions.txt   # FP8 KV (FlashInfer JIT)

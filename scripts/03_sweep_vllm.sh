@@ -18,11 +18,12 @@ kv_auto() {  # kv_auto <server log>: KV size automatic sizing gave, smallest ove
     python3 -c "import sys; v=sys.stdin.read().strip(); print(int(float(v)*2**30) if v else 0)"
 }
 # kv_env <extra args>: environment for FP8 KV configs only. On sm_86 vLLM serves FP8 KV through FlashInfer, whose
-# kernels are compiled on first use: it needs CUDA_HOME (the CUDA 13 toolkit that ships as pip wheels inside the venv;
-# /usr/local/cuda is 12.3, too old for torch cu130) and ninja on PATH. Other configs run with the plain environment.
+# kernels are compiled on first use: it needs CUDA_HOME (a CUDA 13.0 toolkit matching torch's cudart, built by
+# scripts/01b_jit_toolkit.sh; the venv's nvcc 13.5 fails CCCL's version check, /usr/local/cuda is 12.3) and ninja on
+# PATH. Other configs run with the plain environment.
 kv_env() {
   case " $1 " in *" --kv-cache-dtype fp8"*)
-    local c="$VENV/lib/python3.12/site-packages/nvidia/cu13"
+    local c="$BULK/cuda-jit-13.0/nvidia/cu13"   # built by scripts/01b_jit_toolkit.sh
     echo "CUDA_HOME=$c PATH=$VENV/bin:$c/bin:$PATH FLASHINFER_WORKSPACE_BASE=$BULK/flashinfer-ws FLASHINFER_CUDA_ARCH_LIST=8.6" ;;
   esac; }
 [ "${1:-}" = "--check-bench-log" ] && { bench_ok "$2"; exit $?; }   # used by tests/test_scripts.py

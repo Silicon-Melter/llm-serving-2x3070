@@ -30,7 +30,7 @@ stage_done() { local d="$1"
 BULK="${BULK:-/media/earth/SSD2/llm-serving}"; VENV="$BULK/envs/serve-vllm"
 kv_env() {  # kv_env <extra args>: FlashInfer JIT environment for FP8 KV configs (see 03_sweep_vllm.sh)
   case " $1 " in *" --kv-cache-dtype fp8"*)
-    local c="$VENV/lib/python3.12/site-packages/nvidia/cu13"
+    local c="$BULK/cuda-jit-13.0/nvidia/cu13"   # built by scripts/01b_jit_toolkit.sh
     echo "CUDA_HOME=$c PATH=$VENV/bin:$c/bin:$PATH FLASHINFER_WORKSPACE_BASE=$BULK/flashinfer-ws FLASHINFER_CUDA_ARCH_LIST=8.6" ;;
   esac; }
 [ "${1:-}" = "--kv-env" ] && { kv_env "$2"; exit 0; }   # used by tests/test_scripts.py
