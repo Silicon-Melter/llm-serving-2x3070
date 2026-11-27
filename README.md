@@ -42,7 +42,10 @@ will show.
    with on sm_86. The venv's own nvcc is 13.5 against 13.0 headers, which CCCL rejects.
 3. `bash scripts/02_nccl.sh` → `results/nccl_allreduce.txt`.
 4. `bash scripts/03_sweep_vllm.sh` (each config: start server, wait, sweep concurrency, stop) → `results/vllm/*.json`.
-5. `bash scripts/04_sweep_sglang.sh` → `results/sglang/*.json`.
+5. `bash scripts/04_sweep_sglang.sh` → `results/sglang/<run>/*.json`. It uses the same client (`vllm bench serve`) and
+   workload as step 4, so `05_analyse.py` reads both engines (column `engine`). Single-stream llama.cpp (T1 / T2):
+   `bash scripts/13_llamacpp.sh` builds llama.cpp for sm_86, downloads the community's GGUFs and runs llama-bench
+   → `results/llamacpp/<run>/`.
 6. `python scripts/05_analyse.py results/ --runs m3-581eb68 m3b-ab5bb8b` → `results/summary.csv` and the charts. Name the runs: other folders under `results/vllm/` are pre-checks and probes with different KV sizes (e.g. `m3-tpcheck*` used automatic sizing, 24,576 KV tokens instead of 46,464).
 7. Tuning round on the best config: CUDA graphs on/off, `--max-num-seqs`, chunked prefill, `--kv-cache-dtype fp8`,
    PP with more in-flight requests. Change one thing at a time and log why.
