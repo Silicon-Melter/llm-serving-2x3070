@@ -1,0 +1,5 @@
+mem_fraction_static 0.82
+extra --tp-size 2 --kv-cache-dtype fp8_e4m3 --disable-prefill-cuda-graph
+chunked_prefill_size=2048
+max_running_requests=64
+max_total_num_tokens=31021
