@@ -348,3 +348,27 @@ exit 0
     assert _after(smoke, "--backend") == ["openai"] and _after(smoke, "--max-concurrency") == ["64"]
     assert "--ignore-eos" in smoke and _after(smoke, "--temperature") == ["0"]
     assert _after(smoke, "--random-input-len") == ["512"]
+
+
+def test_llamacpp_bench_runs_each_split_on_the_right_cards(tmp_path):
+    """13_llamacpp.sh bench step with a fake llama-bench (JSON as llama-bench -o json writes it)."""
+    fake = tmp_path / "bin"; fake.mkdir()
+    (fake / "nvidia-smi").write_text("#!/bin/sh\necho 0, 600 MiB\n"); (fake / "nvidia-smi").chmod(0o755)
+    b = tmp_path / "bulk/build/llama.cpp/build/bin"; b.mkdir(parents=True)
+    (b / "llama-bench").write_text("#!/bin/sh\necho \"CVD=$CUDA_VISIBLE_DEVICES ARGS $*\" >&2\n"
+                                   "echo '[{\"n_prompt\": 512, \"n_gen\": 0, \"avg_ts\": 1000.5, \"stddev_ts\": 2.0},"
+                                   " {\"n_prompt\": 0, \"n_gen\": 128, \"avg_ts\": 50.25, \"stddev_ts\": 0.5}]'\n")
+    (b / "llama-bench").chmod(0o755)
+    env = {**os.environ, "PATH": f"{fake}:{os.environ['PATH']}", "BULK": str(tmp_path / "bulk"), "STEPS": "bench",
+           "RUN_ID": "t", "REPS": "2", "CPUSET": "0", "ONLY": "t1-qwen3-14b_tensor t2-llama3-8b_1gpu_fa0"}
+    r = subprocess.run(["bash", str(ROOT / "scripts/13_llamacpp.sh")], cwd=tmp_path, capture_output=True, text=True,
+                       env=env, timeout=60)
+    assert r.returncode == 0, r.stderr
+    assert "t1-qwen3-14b_tensor: pp512 1000.50±2.00, tg128 50.25±0.50" in r.stdout, r.stdout
+    out = tmp_path / "results/llamacpp/t"
+    t1 = (out / "t1-qwen3-14b_tensor.log").read_text().split()
+    assert t1[0] == "CVD=0,1" and _after(t1, "-sm") == ["tensor"] and _after(t1, "-r") == ["2"]
+    assert _after(t1, "-m") == [str(tmp_path / "bulk/gguf/qwen3-14b/Qwen3-14B-Q4_K_M.gguf")]
+    t2 = (out / "t2-llama3-8b_1gpu_fa0.log").read_text().split()
+    assert t2[0] == "CVD=1" and _after(t2, "-fa") == ["0"] and _after(t2, "-n") == ["512"] and "-sm" not in t2
+    assert sorted(p.name for p in out.glob("*.json")) == ["t1-qwen3-14b_tensor.json", "t2-llama3-8b_1gpu_fa0.json"]
