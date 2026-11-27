@@ -136,11 +136,14 @@ def test_sweep_sets_the_flashinfer_build_environment_only_for_fp8_kv():
     assert env["PATH"].split(":")[:2] == ["/b/envs/serve-vllm/bin", env["CUDA_HOME"] + "/bin"]
     assert env["FLASHINFER_CUDA_ARCH_LIST"] == "8.6"
     assert run("--tensor-parallel-size 2") == [] and run("") == []
+    # the BF16-KV control on FlashInfer needs the same JIT environment
+    assert run("--tensor-parallel-size 2 --attention-backend FLASHINFER") == run("--kv-cache-dtype fp8")
 
 
 def test_quality_and_sweep_use_the_same_fp8_kv_environment():
     out = lambda script, extra: subprocess.run(["bash", str(ROOT / "scripts" / script), "--kv-env", extra],  # noqa: E731
                                                capture_output=True, text=True, env={**os.environ, "BULK": "/b"}).stdout
-    for extra in ("--tensor-parallel-size 2 --kv-cache-dtype fp8 --kv-cache-memory-bytes 1", "--tensor-parallel-size 2"):
+    for extra in ("--tensor-parallel-size 2 --kv-cache-dtype fp8 --kv-cache-memory-bytes 1", "--tensor-parallel-size 2",
+                  "--tensor-parallel-size 2 --attention-backend FLASHINFER"):
         assert out("06_quality.sh", extra) == out("03_sweep_vllm.sh", extra)
     assert out("06_quality.sh", "--kv-cache-dtype fp8").startswith("CUDA_HOME=")

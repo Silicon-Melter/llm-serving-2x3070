@@ -22,7 +22,7 @@ kv_auto() {  # kv_auto <server log>: KV size automatic sizing gave, smallest ove
 # scripts/01b_jit_toolkit.sh; the venv's nvcc 13.5 fails CCCL's version check, /usr/local/cuda is 12.3) and ninja on
 # PATH. Other configs run with the plain environment.
 kv_env() {
-  case " $1 " in *" --kv-cache-dtype fp8"*)
+  case " $1 " in *" --kv-cache-dtype fp8"*|*" --attention-backend FLASHINFER"*)
     local c="$BULK/cuda-jit-13.0/nvidia/cu13"   # built by scripts/01b_jit_toolkit.sh
     echo "CUDA_HOME=$c PATH=$VENV/bin:$c/bin:$PATH FLASHINFER_WORKSPACE_BASE=$BULK/flashinfer-ws FLASHINFER_CUDA_ARCH_LIST=8.6" ;;
   esac; }
@@ -60,6 +60,7 @@ CONFIGS=(
   "4b-fp8_1gpu|1|Qwen/Qwen3-4B-FP8|"                              # M5: passes the quality gate; speed not yet measured
   "4b-fp8_dp2|0,1|Qwen/Qwen3-4B-FP8|--data-parallel-size 2"
   "8b-w8a8_tp2_fp8kv|0,1|nm-testing/Qwen3-8B-W8A8-INT8|--tensor-parallel-size 2 --kv-cache-dtype fp8"   # M5 step 2
+  "8b-w8a8_tp2_fi|0,1|nm-testing/Qwen3-8B-W8A8-INT8|--tensor-parallel-size 2 --attention-backend FLASHINFER"   # control: FlashInfer, BF16 KV
   # 8B as 2 copies: with torch.compile (Inductor) the GPU0 copy runs out of memory while autotuning a 2,048-token
   # logits buffer (1.16 GiB), so these run with the Inductor backend off; the _eager 1-GPU and TP=2 runs measure what
   # that costs, so H1 compares like with like.
