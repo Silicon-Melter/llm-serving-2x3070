@@ -1,6 +1,7 @@
 """Checks for the shell scripts in scripts/. Run: python -m pytest tests -q
 The library test needs the envs and nccl-tests build from scripts/01_setup.sh; it is skipped (with a reason) if they
 are missing, so the syntax checks still run on any machine."""
+import gzip
 import os
 import pathlib
 import subprocess
@@ -147,3 +148,30 @@ def test_quality_and_sweep_use_the_same_fp8_kv_environment():
                   "--tensor-parallel-size 2 --attention-backend FLASHINFER"):
         assert out("06_quality.sh", extra) == out("03_sweep_vllm.sh", extra)
     assert out("06_quality.sh", "--kv-cache-dtype fp8").startswith("CUDA_HOME=")
+
+
+def _quality_run(tmp_path, **env):
+    """06_quality.sh in a scratch folder: a vllm that exits at once, an nvidia-smi that reports idle GPUs."""
+    fake = tmp_path / "bin"; fake.mkdir(exist_ok=True)
+    (fake / "nvidia-smi").write_text("#!/bin/sh\necho 0\n"); (fake / "nvidia-smi").chmod(0o755)
+    venv = tmp_path / "bulk/envs/serve-vllm/bin"; venv.mkdir(parents=True, exist_ok=True)
+    (venv / "vllm").write_text("#!/bin/sh\necho 'ValueError: fake server' >&2\nexit 1\n"); (venv / "vllm").chmod(0o755)
+    (tmp_path / "results/quality").mkdir(parents=True, exist_ok=True); (tmp_path / "results/quality/corpus.json").write_text("{}")
+    base = {**os.environ, "PATH": f"{fake}:{os.environ['PATH']}", "BULK": str(tmp_path / "bulk"), "PORT": "59997",
+            "RUN_ID": "t", "ONLY": "4b-fp8_1gpu", "STAGES": "kld", "CPUSET": "0"}
+    return subprocess.run(["bash", str(ROOT / "scripts/06_quality.sh")], cwd=tmp_path, capture_output=True, text=True,
+                          env={**base, **env}, timeout=120)
+
+
+def test_quality_exits_nonzero_when_a_stage_is_left_undone(tmp_path):
+    r = _quality_run(tmp_path)
+    assert "did not start" in r.stdout and "incomplete: 4b-fp8_1gpu:kld" in r.stdout
+    assert r.returncode == 1
+
+
+def test_quality_exits_zero_when_every_stage_is_done(tmp_path):
+    d = tmp_path / "results/quality/t/4b-fp8_1gpu"; d.mkdir(parents=True)
+    (d / "logprobs.jsonl.gz").write_bytes(gzip.compress(b'{"x": 1}\n'))
+    r = _quality_run(tmp_path)
+    assert "already done, skipped" in r.stdout and "incomplete" not in r.stdout
+    assert r.returncode == 0

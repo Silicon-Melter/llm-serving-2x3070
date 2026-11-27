@@ -8,6 +8,8 @@
 #   STAGES="kld" bash scripts/06_quality.sh        # quick screen only (Stage A)
 # Resumable: a stage whose output already exists (and is not an empty or cut-off file) is skipped, so re-running
 # with the same RUN_ID after a crash only does what is missing. FORCE=1 redoes everything.
+# Exit status: 1 if any selected config is left with a stage not done (a FAILED stage or a server that did not
+# start), so a board job does not show "done" over a missing result.
 set -uo pipefail
 # stage_done <config dir> <stage>: 0 if that stage's output is complete. A reset can leave 0-byte or cut-off files.
 # samples_nonempty <config dir> <task>: sample files with at least one line, plain or gzipped (committed results are
@@ -35,7 +37,7 @@ kv_env() {  # kv_env <extra args>: FlashInfer JIT environment for FP8 KV configs
   esac; }
 [ "${1:-}" = "--kv-env" ] && { kv_env "$2"; exit 0; }   # used by tests/test_scripts.py
 export HF_HUB_CACHE="${HF_HUB_CACHE:-$BULK/hf}"
-PORT=8000; HOST=127.0.0.1; CPUSET="${CPUSET:-0-19}"; SEED=1234
+PORT="${PORT:-8000}"; HOST=127.0.0.1; CPUSET="${CPUSET:-0-19}"; SEED=1234
 STAGES="${STAGES:-kld gsm8k mmlu}"; MMLU_LIMIT="${MMLU_LIMIT:-20}"; GSM8K_LIMIT="${GSM8K_LIMIT:-}"
 CONCURRENCY="${CONCURRENCY:-32}"   # requests in flight from the evaluator; a second run with another value = noise floor
 RUN_ID="${RUN_ID:-$(date +%Y%m%d-%H%M%S)}"; OUT="results/quality/$RUN_ID"; mkdir -p "$OUT"
@@ -71,6 +73,8 @@ declare -A IDLE; for g in 0 1; do IDLE[$g]=$(gpu_used $g); done
 wait_idle() { local i g busy; for i in $(seq 1 60); do busy=""
     for g in 0 1; do [ $(( $(gpu_used $g) - ${IDLE[$g]} )) -gt 300 ] && busy=1; done
     [ -z "$busy" ] && return 0; sleep 5; done; return 1; }
+INCOMPLETE=""
+note_incomplete() { local s; for s in $STAGES; do stage_done "$1" "$s" || INCOMPLETE="$INCOMPLETE $2:$s"; done; }
 stop_server() { kill -INT -- -"$1" 2>/dev/null; for _ in $(seq 1 30); do kill -0 "$1" 2>/dev/null || break; sleep 2; done
   kill -KILL -- -"$1" 2>/dev/null; wait "$1" 2>/dev/null; wait_idle; }
 
@@ -91,7 +95,7 @@ for c in "${CONFIGS[@]}"; do
   for _ in $(seq 1 480); do curl -sf "http://$HOST:$PORT/health" >/dev/null && { up=1; break; }
     kill -0 "$SPID" 2>/dev/null || break; sleep 5; done
   if [ -z "$up" ]; then echo "  did not start: $(grep -m1 -E 'out of memory|Error' "$D/server.log" | sed 's/^.*\] //' | cut -c1-160)"
-    stop_server "$SPID"; continue; fi
+    stop_server "$SPID"; note_incomplete "$D" "$NAME"; continue; fi
   grep -hE "GPU KV cache size|Model loading took|kv_cache_dtype|MarlinLinearKernel|quantization" "$D/server.log" | sed 's/^.*\] //' | sort -u > "$D/server.txt"
   T0=$(date +%s)
   if [[ " $TODO " == *" kld "* ]]; then
@@ -108,6 +112,8 @@ for c in "${CONFIGS[@]}"; do
       && echo "  mmlu: $(grep -E '^\|mmlu ' "$D/mmlu.log" | head -1 | tr -s ' ') ($(( $(date +%s) - T0 )) s)" || echo "  mmlu: FAILED (see $D/mmlu.log)"
   fi
   sync   # results on disk before the next config (a reset lost unflushed sample files once)
+  note_incomplete "$D" "$NAME"
   stop_server "$SPID" || { echo "  GPUs did not return to idle, stopping"; exit 1; }
 done
 echo "done: $OUT"
+[ -z "$INCOMPLETE" ] || { echo "incomplete:$INCOMPLETE"; exit 1; }
