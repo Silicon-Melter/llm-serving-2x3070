@@ -228,19 +228,35 @@ def test_sweep_server_gets_max_num_seqs_exactly_once():
 
 
 def test_sweep_starts_each_server_with_the_right_max_num_seqs(tmp_path):
-    """The real sweep loop with a vllm that logs its arguments and exits: what each server is started with."""
+    """The real sweep loop against a fake vllm: `serve` answers /health (python http.server), `bench` logs its
+    arguments and fails. Checks the server command line and the concurrency of the KV smoke test, per config."""
     fake = tmp_path / "bin"; fake.mkdir()
     (fake / "nvidia-smi").write_text("#!/bin/sh\necho 0\n"); (fake / "nvidia-smi").chmod(0o755)
+    www = tmp_path / "www"; www.mkdir(); (www / "health").write_text("ok")
+    # bash starts background jobs with SIGINT ignored; the fake server restores it so stop_server's INT works
+    (tmp_path / "server.py").write_text(
+        "import functools, http.server, signal\n"
+        "signal.signal(signal.SIGINT, signal.default_int_handler)\n"
+        f"h = functools.partial(http.server.SimpleHTTPRequestHandler, directory={str(www)!r})\n"
+        "http.server.ThreadingHTTPServer(('127.0.0.1', 59996), h).serve_forever()\n")
     venv = tmp_path / "bulk/envs/serve-vllm/bin"; venv.mkdir(parents=True)
-    (venv / "vllm").write_text('#!/bin/sh\necho "ARGS $*"\nexit 1\n'); (venv / "vllm").chmod(0o755)
+    (venv / "vllm").write_text(f"""#!/bin/sh
+echo "ARGS $*"
+[ "$1" = serve ] && exec python3 -I {tmp_path / "server.py"} 2>/dev/null
+exit 1
+""")
+    (venv / "vllm").chmod(0o755)
     for tool in ("hf", "huggingface-cli"):
         (venv / tool).write_text("#!/bin/sh\nexit 0\n"); (venv / tool).chmod(0o755)
     env = {**os.environ, "PATH": f"{fake}:{os.environ['PATH']}", "BULK": str(tmp_path / "bulk"), "PORT": "59996",
            "RUN_ID": "t", "ONLY": "8b-awq_tp2 8b-awq_tp2_fp8kv_s128", "CPUSET": "0", "KV_STEPS": "0.95"}
     r = subprocess.run(["bash", str(ROOT / "scripts/03_sweep_vllm.sh")], cwd=tmp_path, capture_output=True, text=True,
-                       env=env, timeout=120)
-    assert r.stdout.count("does not fit") == 2, r.stdout
-    args = lambda name: (tmp_path / f"results/vllm/t/{name}.try-auto.log").read_text().split()  # noqa: E731
-    plain, s128 = args("8b-awq_tp2"), args("8b-awq_tp2_fp8kv_s128")
-    assert plain.count("--max-num-seqs") == 1 and plain[plain.index("--max-num-seqs") + 1] == "64"
-    assert s128.count("--max-num-seqs") == 1 and s128[s128.index("--max-num-seqs") + 1] == "128"
+                       env=env, timeout=180)
+    assert "failed the c=64 smoke test" in r.stdout and "failed the c=128 smoke test" in r.stdout, r.stdout
+    out = tmp_path / "results/vllm/t"
+    words = lambda f: (out / f).read_text().split()  # noqa: E731
+    after = lambda w, flag: [w[i + 1] for i, x in enumerate(w) if x == flag]  # noqa: E731
+    assert after(words("8b-awq_tp2.try-auto.log"), "--max-num-seqs") == ["64"]
+    assert after(words("8b-awq_tp2_fp8kv_s128.try-auto.log"), "--max-num-seqs") == ["128"]
+    assert after(words("8b-awq_tp2.try-auto.smoke.log"), "--max-concurrency") == ["64"]
+    assert after(words("8b-awq_tp2_fp8kv_s128.try-auto.smoke.log"), "--max-concurrency") == ["128"]
