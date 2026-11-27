@@ -1,0 +1,52 @@
+W1127 16:46:14.101000 2191019 site-packages/torch/_opaque_base.py:6] torch._opaque_base is deprecated, use torch._custom_class_base instead
+W1127 16:46:14.101000 2191019 site-packages/torch/_library/opaque_object.py:288] register_opaque_type is deprecated, use register_custom_class instead
+W1127 16:46:14.101000 2191019 site-packages/torch/_library/opaque_object.py:211] typ='value' is deprecated, use typ='constant' instead
+FlashInfer kernels are disabled: flashinfer-cubin is not installed and nvcc (CUDA_HOME, CUDA_PATH, PATH or /usr/local/cuda) or ninja (PATH) is missing. Set CUDA_HOME to a CUDA toolkit and put ninja on PATH, or run `vllm download-kernels`.
+Namespace(subparser='bench', bench_type='serve', dispatch_function=<function BenchmarkServingSubcommand.cmd at 0x759278da1c60>, trust_remote_code=False, seed=0, num_prompts=128, dataset_name='random', no_stream=False, dataset_path=None, no_oversample=False, skip_chat_template=False, enable_multimodal_chat=False, disable_shuffle=False, custom_output_len=256, custom_ensure_client_side_data=False, spec_bench_output_len=256, spec_bench_category=None, sharegpt_output_len=None, timed_trace_chunk_hash_size=16, timed_trace_sec_multiplier=1, timed_trace_label_timestamp='timestamp', timed_trace_label_input_length='input_length', timed_trace_label_output_length='output_length', timed_trace_label_hash_ids='hash_ids', blazedit_min_distance=0.0, blazedit_max_distance=1.0, asr_max_audio_len_sec=inf, asr_min_audio_len_sec=0.0, random_input_len=512, random_output_len=16, random_range_ratio='0', random_prefix_len=0, random_batch_size=1, no_reranker=False, random_mm_base_items_per_request=1, random_mm_num_mm_items_range_ratio=0.0, random_mm_limit_mm_per_prompt={'image': 255, 'video': 1}, random_mm_bucket_config={(256, 256, 1): 0.5, (720, 1280, 1): 0.5, (720, 1280, 16): 0.0}, hf_subset=None, hf_split=None, hf_name=None, hf_output_len=None, bfcl_categories=None, prefix_repetition_prefix_len=256, prefix_repetition_suffix_len=256, prefix_repetition_num_prefixes=10, prefix_repetition_output_len=128, speed_bench_dataset_subset='qualitative', speed_bench_output_len=4096, speed_bench_category=None, label=None, backend='vllm', base_url=None, host='127.0.0.1', port=8000, endpoint='/v1/completions', header=None, max_concurrency=64, model='nm-testing/Qwen3-8B-W8A8-INT8', input_len=None, output_len=None, tokenizer=None, tokenizer_mode='auto', use_beam_search=False, logprobs=None, request_rate=inf, burstiness=1.0, probe_request_rate=0.0, disable_tqdm=False, num_warmups=0, profile=False, save_result=False, save_detailed=False, append_result=False, metadata=None, result_dir=None, result_filename=None, ignore_eos=True, self_timed=None, percentile_metrics=None, metric_percentiles='99', goodput=None, request_id_prefix='bench-26677848-', top_p=None, top_k=None, min_p=None, temperature=0.0, frequency_penalty=None, presence_penalty=None, repetition_penalty=None, served_model_name=None, lora_modules=None, lora_assignment='random', ramp_up_strategy=None, ramp_up_start_rps=None, ramp_up_end_rps=None, ready_check_timeout_sec=0, chat_template_kwargs=None, extra_body=None, skip_tokenizer_init=False, insecure=False, plot_timeline=False, timeline_itl_thresholds='25,50', plot_dataset_stats=False, log_config_file=None, logging_config=LoggingConfig(log_level='INFO', formatter='text', configure_logging=True, pylogging_config_file=None))
+Fetching 8 files:   0%|          | 0/8 [00:00<?, ?it/s]Fetching 8 files: 100%|██████████| 8/8 [00:00<00:00, 3059.58it/s]
+(MainProcess pid=2191019) INFO 11-27 16:46:21 [utils.py:88] Sampling input_len from [512, 512] and output_len from [16, 16]
+Starting initial single prompt test run...
+Skipping endpoint ready check.
+Starting main benchmark run...
+Traffic request rate: inf
+Burstiness factor: 1.0 (Poisson process)
+Maximum request concurrency: 64
+  0%|          | 0/128 [00:00<?, ?it/s]  1%|          | 1/128 [00:00<00:19,  6.63it/s] 44%|████▍     | 56/128 [00:00<00:00, 267.86it/s]100%|██████████| 128/128 [00:00<00:00, 412.45it/s]
+/media/earth/SSD2/llm-serving/envs/serve-vllm/lib/python3.12/site-packages/vllm/benchmarks/serve.py:1204: UserWarning: All requests failed. This is likely due to a misconfiguration on the benchmark arguments.
+  metrics, actual_output_lens = calculate_metrics(
+Failed requests during benchmark run detected (capping to 10):
+Error 0: {"message": "The server had an error while processing your request.", "type": "InternalServerError", "param": null, "code": 500}
+Error 1: {"message": "The server had an error while processing your request.", "type": "InternalServerError", "param": null, "code": 500}
+Error 2: {"message": "The server had an error while processing your request.", "type": "InternalServerError", "param": null, "code": 500}
+Error 3: {"message": "The server had an error while processing your request.", "type": "InternalServerError", "param": null, "code": 500}
+Error 4: {"message": "The server had an error while processing your request.", "type": "InternalServerError", "param": null, "code": 500}
+Error 5: {"message": "The server had an error while processing your request.", "type": "InternalServerError", "param": null, "code": 500}
+Error 6: {"message": "The server had an error while processing your request.", "type": "InternalServerError", "param": null, "code": 500}
+Error 7: {"message": "The server had an error while processing your request.", "type": "InternalServerError", "param": null, "code": 500}
+Error 8: {"message": "The server had an error while processing your request.", "type": "InternalServerError", "param": null, "code": 500}
+Error 9: {"message": "The server had an error while processing your request.", "type": "InternalServerError", "param": null, "code": 500}
+============ Serving Benchmark Result ============
+Successful requests:                     0         
+Failed requests:                         128       
+Maximum request concurrency:             64        
+Benchmark duration (s):                  0.31      
+Total input tokens:                      0         
+Total generated tokens:                  0         
+Request throughput (req/s):              0.00      
+Output token throughput (tok/s):         0.00      
+Peak output token throughput (tok/s):    0.00      
+Peak concurrent requests:                0.00      
+Total token throughput (tok/s):          0.00      
+---------------Time to First Token----------------
+Mean TTFT (ms):                          0.00      
+Median TTFT (ms):                        0.00      
+P99 TTFT (ms):                           0.00      
+-----Time per Output Token (excl. 1st token)------
+Mean TPOT (ms):                          0.00      
+Median TPOT (ms):                        0.00      
+P99 TPOT (ms):                           0.00      
+---------------Inter-token Latency----------------
+Mean ITL (ms):                           0.00      
+Median ITL (ms):                         0.00      
+P99 ITL (ms):                            0.00      
+==================================================
