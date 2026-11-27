@@ -1,0 +1,16 @@
+## swe-verify — llm-serving-2x3070 main @ 9dd44ed (base 50d7ed9 = origin/main), 2026-11-27, by Claude Opus 5.5 (ad-pc, session b4e95076)
+Scope: `git diff --stat 50d7ed9..9dd44ed -- scripts tests`:
+- **scripts/03_sweep_vllm.sh:** a config may set its own `--max-num-seqs`; new `seqs_of` / `seq_arg` helpers; the smoke test runs at the config's own concurrency; `PORT` can be overridden; two `_s128` configs.
+- **tests/test_scripts.py:** 3 new tests and one extended rule.
+- **Also changed:** results/vllm/m5e-c473162 (data).
+
+| Layer | Verdict | Command | Evidence (pasted) |
+|---|---|---|---|
+| 1 Unit | PASS | `env -u LD_LIBRARY_PATH python3 -m pytest tests -q` | `68 passed in 14.12s`; the new fake-vllm sweep test takes 12.2–12.5 s over 3 runs |
+| 1 Audit | PASS | `git diff 50d7ed9..9dd44ed -- tests/` | **Additions only,** plus `"_s128": "--max-num-seqs 128"` added to the variant-flag rule, which widens the check. No skip, tolerance or loosened assert. **Fakes stand in only for external programs,** never the code under test: `vllm` serves `/health` from a python http.server and logs its arguments, and `nvidia-smi` reports idle. The real 03 script runs end to end. |
+| 1 Red-green | PASS | One mutation at a time in a detached worktree; run tests/test_scripts.py; restore | `seq_arg` always empty → `2 failed`. `seq_arg` always adds → `2 failed`. COMMON keeps `--max-num-seqs 64` → `2 failed`. Loop skips `seq_arg` → `1 failed`. `serve` drops `$SEQ_ARG` → `1 failed`. Default 64 → 32 → `3 failed`. Smoke test not per config → `1 failed`; it survived before 0c0a99e, when the fake vllm exited without serving, so the test was upgraded. New `_s128` row given a second flag → covered by the 2b1c1b1 table test. Restored → `68 passed`. |
+| 2 E2E | PASS | `board-job run ad-pc.llm-serving-2x3070.m5e-c128 -- env CPUSET=0-2,4-18 RUN_ID=m5e-c473162 REPEAT=2 CONC="64 128" ONLY="8b-w8a8_tp2_fp8kv_s128 8b-awq_tp2_fp8kv_s128" bash scripts/03_sweep_vllm.sh` at c473162 | **Servers started with the intended value.** vLLM's `non-default args` show `'max_num_seqs': 128` for both `_s128` servers, and `'max_num_seqs': 64` for m5d at 009667d (the plain path before the change). **KV and bench:** W8A8 `ok (0.75 …): 23,616 tokens`, AWQ `ok (0.90 …): 70,336 tokens`; 8 bench runs, all OK (c=64 916.7 / 916.3 and 937.1 / 960.1, c=128 911.9 / 897.4 and 817.1 / 828.5); job `exit 0`. **Server logs:** running batch up to 40 (W8A8, KV 99.5 %) and 120 (AWQ). **Not GPU-run:** the `seq_arg` refactor (ad89a72) and `PORT` change are equivalent to c473162 and are checked by the fake-vllm test running the real loop. |
+| 3 Perf | INFORMATIONAL | same run | **c=64 against the 64-slot runs:** W8A8 916.5 vs 1086.0 (−15.6 %) and AWQ 948.6 vs 1025.2 (−7.5 %). These come from the 128-slot setting, not from the code: KV 23,616 vs 35,776 and 70,336 vs 82,112. |
+| 4 Numerics | n/a | | no op code |
+| 5 Metrics | n/a | | speed-only configs; quality does not depend on max-num-seqs |
+**Verdict: PASS** — per-config max-num-seqs reaches the server and the smoke test, shown on the GPU at c473162 and by the fake-vllm test at 9dd44ed. Every new rule fails when broken. Gaps: the plain (64) path after the refactor is covered by the fake-vllm test only, not yet by a GPU run.
