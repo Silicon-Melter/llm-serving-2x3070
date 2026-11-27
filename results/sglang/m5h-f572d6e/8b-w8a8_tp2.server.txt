@@ -1,0 +1,5 @@
+mem_fraction_static 0.75
+extra --tp-size 2
+chunked_prefill_size=2048
+max_running_requests=64
+max_total_num_tokens=8676
