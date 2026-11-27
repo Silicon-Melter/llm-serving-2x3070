@@ -1,0 +1,6 @@
+ggml_cuda_init: found 2 CUDA devices (Total VRAM: 15675 MiB):
+  Device 0: NVIDIA GeForce RTX 3070, compute capability 8.6, VMM: yes, VRAM: 7833 MiB
+  Device 1: NVIDIA GeForce RTX 3070, compute capability 8.6, VMM: yes, VRAM: 7842 MiB
+llama_model_load: error loading model: device CUDA0 does not support split buffers
+llama_model_load_from_file_impl: failed to load model
+llama_bench: error: failed to load model '/media/earth/SSD2/llm-serving/gguf/qwen3-14b/Qwen3-14B-Q4_K_M.gguf'

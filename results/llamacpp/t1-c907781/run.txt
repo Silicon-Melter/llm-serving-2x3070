@@ -1,0 +1,9 @@
+run_id t1-c907781
+llama.cpp a38695013 2026-11-27 14:51:55 +0100
+reps 5 cpuset 0-2,4-18
+started 2026-11-27T21:46:32+07:00 commit c907781
+gguf llama3-8b JaaackXD/Llama-3-8B-GGUF|ggml-model-Q4_K_M.gguf 4920733536 bytes
+gguf qwen3-14b Qwen/Qwen3-14B-GGUF|Qwen3-14B-Q4_K_M.gguf 9001752960 bytes
+gguf qwen3-8b Qwen/Qwen3-8B-GGUF|Qwen3-8B-Q4_K_M.gguf 5027783488 bytes
+idle 0, 676 MiB
+idle 1, 18 MiB
