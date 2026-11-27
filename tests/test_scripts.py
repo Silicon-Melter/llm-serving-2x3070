@@ -228,9 +228,9 @@ def test_sweep_server_gets_max_num_seqs_exactly_once():
     assert "--max-model-len 4096" in common and "--max-num-seqs" not in common
 
 
-def test_sweep_starts_each_server_with_the_right_max_num_seqs(tmp_path):
+def _fake_sweep(tmp_path, **extra_env):
     """The real sweep loop against a fake vllm: `serve` answers /health (python http.server), `bench` logs its
-    arguments and fails. Checks the server command line and the concurrency of the KV smoke test, per config."""
+    arguments and fails, so every config ends after its first smoke test. Returns (stdout, words of a result file)."""
     fake = tmp_path / "bin"; fake.mkdir()
     (fake / "nvidia-smi").write_text("#!/bin/sh\necho 0\n"); (fake / "nvidia-smi").chmod(0o755)
     www = tmp_path / "www"; www.mkdir(); (www / "health").write_text("ok")
@@ -250,14 +250,32 @@ exit 1
     for tool in ("hf", "huggingface-cli"):
         (venv / tool).write_text("#!/bin/sh\nexit 0\n"); (venv / tool).chmod(0o755)
     env = {**os.environ, "PATH": f"{fake}:{os.environ['PATH']}", "BULK": str(tmp_path / "bulk"), "PORT": "59996",
-           "RUN_ID": "t", "ONLY": "8b-awq_tp2 8b-awq_tp2_fp8kv_s128", "CPUSET": "0", "KV_STEPS": "0.95"}
+           "RUN_ID": "t", "ONLY": "8b-awq_tp2 8b-awq_tp2_fp8kv_s128", "CPUSET": "0", "KV_STEPS": "0.95",
+           **extra_env}
     r = subprocess.run(["bash", str(ROOT / "scripts/03_sweep_vllm.sh")], cwd=tmp_path, capture_output=True, text=True,
                        env=env, timeout=180)
-    assert "failed the c=64 smoke test" in r.stdout and "failed the c=128 smoke test" in r.stdout, r.stdout
     out = tmp_path / "results/vllm/t"
-    words = lambda f: (out / f).read_text().split()  # noqa: E731
-    after = lambda w, flag: [w[i + 1] for i, x in enumerate(w) if x == flag]  # noqa: E731
-    assert after(words("8b-awq_tp2.try-auto.log"), "--max-num-seqs") == ["64"]
-    assert after(words("8b-awq_tp2_fp8kv_s128.try-auto.log"), "--max-num-seqs") == ["128"]
-    assert after(words("8b-awq_tp2.try-auto.smoke.log"), "--max-concurrency") == ["64"]
-    assert after(words("8b-awq_tp2_fp8kv_s128.try-auto.smoke.log"), "--max-concurrency") == ["128"]
+    return r.stdout, lambda f: (out / f).read_text().split()
+
+
+def _after(words, flag):
+    return [words[i + 1] for i, w in enumerate(words) if w == flag]
+
+
+def test_sweep_starts_each_server_with_the_right_max_num_seqs(tmp_path):
+    """Server command line and KV smoke-test concurrency per config (64 for plain configs, 128 for *_s128)."""
+    stdout, words = _fake_sweep(tmp_path)
+    assert "failed the c=64 smoke test" in stdout and "failed the c=128 smoke test" in stdout, stdout
+    assert _after(words("8b-awq_tp2.try-auto.log"), "--max-num-seqs") == ["64"]
+    assert _after(words("8b-awq_tp2_fp8kv_s128.try-auto.log"), "--max-num-seqs") == ["128"]
+    assert _after(words("8b-awq_tp2.try-auto.smoke.log"), "--max-concurrency") == ["64"]
+    assert _after(words("8b-awq_tp2_fp8kv_s128.try-auto.smoke.log"), "--max-concurrency") == ["128"]
+    assert _after(words("8b-awq_tp2.try-auto.smoke.log"), "--random-input-len") == ["512"]
+    assert words("run.txt")[words("run.txt").index("in") + 1] == "512"
+
+
+def test_sweep_prompt_length_can_be_set(tmp_path):
+    """IN / OUTLEN override the 512 / 256 workload (T4 compares at 120 in / 256 out)."""
+    _, words = _fake_sweep(tmp_path, IN="120", OUTLEN="200", ONLY="8b-awq_tp2")
+    assert _after(words("8b-awq_tp2.try-auto.smoke.log"), "--random-input-len") == ["120"]
+    run = words("run.txt"); assert run[run.index("in") + 1] == "120" and run[run.index("out") + 1] == "200"

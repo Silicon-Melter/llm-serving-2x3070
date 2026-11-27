@@ -37,7 +37,7 @@ seq_arg() { [[ " $1 " == *" --max-num-seqs "* ]] || echo "--max-num-seqs $(seqs_
 [ "${1:-}" = "--seq-arg" ] && { seq_arg "$2"; exit 0; }
 export HF_HUB_CACHE="${HF_HUB_CACHE:-$BULK/hf}"
 PORT="${PORT:-8000}"; HOST=127.0.0.1                     # 127.0.0.1, not localhost (name lookup adds latency)
-CONC="${CONC:-1 4 16 64}"; IN=512; OUTLEN=256; REPEAT="${REPEAT:-1}"; SEED=1234
+CONC="${CONC:-1 4 16 64}"; IN="${IN:-512}"; OUTLEN="${OUTLEN:-256}"; REPEAT="${REPEAT:-1}"; SEED=1234   # IN/OUTLEN: T4 uses 120/256
 RUN_ID="${RUN_ID:-$(date +%Y%m%d-%H%M%S)}"; OUT="results/vllm/$RUN_ID"; mkdir -p "$OUT"
 # Prefix caching off: random prompts must not hit a cache. Same max length everywhere so KV budgets compare.
 # --max-num-seqs 64 = the highest concurrency tested; vLLM's default (256) reserves sampler memory for 256 requests.
